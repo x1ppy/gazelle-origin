@@ -87,12 +87,12 @@ class RedactedAPI:
             ('Catalog number', torrent['remasterCatalogueNumber']),
             ('Record label',   torrent['remasterRecordLabel']),
             ('Original year',  group['year']),
-            ('Log',            '%s%%' % torrent['logScore'] if torrent['hasLog'] else ''),
+            ('Log',            '{0}%%'.format(torrent['logScore'] if torrent['hasLog'] else '')),
             ('File count',     torrent['fileCount']),
             ('Size',           torrent['size']),
             ('Info hash',      torrent['infoHash']),
-            ('Uploaded by',    '%s (%s)' % (torrent['username'], torrent['time'])),
-            ('Permalink',      'https://redacted.ch/torrents.php?torrentid=%s' % torrent['id']),
+            ('Uploaded',       torrent['time']),
+            ('Permalink',      'https://redacted.ch/torrents.php?torrentid={0}'.format(torrent['id'])),
         ]
 
         files = list((a,b) for b,a in (word.split('{{{') for word in torrent['fileList'].replace('}}}', '').split('|||')))

@@ -18,7 +18,7 @@ Log             70%
 File count      12
 Size            219114079
 Info hash       C380B62A3EC6658597C56F45D596E8081B3F7A5C
-Uploaded by     <username> (2016-11-24 01:34:03)
+Uploaded        2016-11-24 01:34:03
 Permalink       https://redacted.ch/torrents.php?torrentid=1
 
 Pink Floyd - Dark Side of the Moon (OMR MFSL 24k Gold Ultradisc II) fixed tags/
