@@ -25,6 +25,7 @@ headers = {
 class RequestException(Exception):
     pass
 
+# RedactedAPI code is based off of REDbetter (https://github.com/Mechazawa/REDBetter-crawler).
 class RedactedAPI:
     def __init__(self, session_cookie=None):
         self.session = requests.Session()
@@ -68,12 +69,11 @@ class RedactedAPI:
         if group['categoryName'] != 'Music':
             return None
 
-        # remastered is always True
         artists = group['musicInfo']['artists']
         if len(artists) == 1:
             artists = artists[0]['name']
         elif len(artists) == 2:
-            artists = '%s & %s' % (artists[0]['name'], artists[1]['name'])
+            artists = '{0} & {1}'.format(artists[0]['name'], artists[1]['name'])
         else:
             artists = 'Various Artists'
 
@@ -114,12 +114,11 @@ def make_table(arr, ljust):
     return result
 
 
-parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter, prog='red-origin')
+formatter_class = argparse.RawDescriptionHelpFormatter
+parser = argparse.ArgumentParser(description='Fetches torrent origin information from redacted.ch', formatter_class=formatter_class)
 parser.add_argument('info_hash', help='info hash of the torrent')
 parser.add_argument('cookie', help='cookie for logging in to RED')
-parser.add_argument('--out', '-o', help='path to write origin file (defaults to stdout)')
-parser.add_argument('--redconfig', help='the location of the REDbetter configuration file', \
-        default=os.path.expanduser('~/.redactedbetter/config'))
+parser.add_argument('--out', '-o', help='path to write origin data (default: print to stdout)', metavar='file')
 
 args = parser.parse_args()
 api = RedactedAPI(args.cookie)
@@ -127,7 +126,7 @@ info = api.get_torrent_info(args.info_hash)
 
 if not info:
     print('Not a music torrent', file=sys.stderr)
-    sys.exit(4)
+    sys.exit(3)
 if args.out:
     with io.open(args.out, 'w', encoding='utf-8') as f:
         f.write(info)
