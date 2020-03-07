@@ -61,13 +61,16 @@ Usage
 -----
 
 ~~~
-usage: red-origin [-h] [--out file] info_hash cookie
+usage: red-origin [-h] [--out file] cookie hash_or_id
+
+Fetches torrent origin information from redacted.ch
 
 positional arguments:
-  info_hash            info hash of the torrent
-  cookie               cookie for logging in to RED
+  cookie               session cookie for logging in to RED
+  hash_or_id           either the info hash of the torrent or the RED torrent ID
 
-optional arguments:                                                                                                                                                                                                                             -h, --help           show this help message and exit
+optional arguments:
+  -h, --help           show this help message and exit
   --out file, -o file  path to write origin data (default: print to stdout)
 ~~~
 
@@ -76,7 +79,7 @@ Examples
 
 To save an origin.txt file to the downloaded directory for a particular torrent:
 
-    $> ./red-origin C380B62A3EC6658597C56F45D596E8081B3F7A5C <your_cookie_here> -o $HOME/downloads/"Pink Floyd - Dark Side of the Moon (OMR MFSL 24k Gold Ultradisc II) fixed tags"/origin.txt
+    $> ./red-origin <your_cookie_here> C380B62A3EC6658597C56F45D596E8081B3F7A5C -o $HOME/downloads/"Pink Floyd - Dark Side of the Moon (OMR MFSL 24k Gold Ultradisc II) fixed tags"/origin.txt
 
 Obtaining Your Cookie
 ---------------------
@@ -94,12 +97,13 @@ Other Notes
 `red-origin` is best used when called automatically in your torrent client when a download finishes. For example, rtorrent users can add something like the following to their `~/.rtorrent.rc`:
 
 ~~~
-method.set_key = event.download.finished,postrun,"execute2={~/postdownload.sh,$d.base_path=,$d.hash=}"
+method.set_key = event.download.finished,postrun,"execute2={~/postdownload.sh,$d.base_path=,$d.hash=,$d.tracker_domain=}"
 ~~~
 
 Then, in `~/postdownload.sh`:
 ~~~
 path=$1
 info_hash=$2
-red-origin $info_hash <your_cookie_here> -o $path/origin.txt
+tracker=$3
+[ $tracker == flacsfor.me ] && red-origin <your_cookie_here> $info_hash -o $path/origin.txt
 ~~~

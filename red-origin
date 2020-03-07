@@ -4,6 +4,7 @@ import html
 import io
 import json
 import os
+import re
 import requests
 import shutil
 import stat
@@ -61,8 +62,8 @@ class RedactedAPI:
         except ValueError:
             raise RequestException
 
-    def get_torrent_info(self, info_hash):
-        info = self.request('torrent', hash=info_hash)
+    def get_torrent_info(self, hash=None, id=None):
+        info = self.request('torrent', hash=hash, id=id)
         group = info['group']
         torrent = info['torrent']
 
@@ -116,17 +117,24 @@ def make_table(arr, ljust):
 
 formatter_class = argparse.RawDescriptionHelpFormatter
 parser = argparse.ArgumentParser(description='Fetches torrent origin information from redacted.ch', formatter_class=formatter_class)
-parser.add_argument('info_hash', help='info hash of the torrent')
-parser.add_argument('cookie', help='cookie for logging in to RED')
+parser.add_argument('cookie', help='session cookie for logging in to RED')
+parser.add_argument('hash_or_id', help='either the info hash of the torrent or the RED torrent ID')
 parser.add_argument('--out', '-o', help='path to write origin data (default: print to stdout)', metavar='file')
 
 args = parser.parse_args()
 api = RedactedAPI(args.cookie)
-info = api.get_torrent_info(args.info_hash)
+
+if re.match(r'^[\da-fA-F]{40}$', args.hash_or_id):
+    info = api.get_torrent_info(hash=args.hash_or_id)
+elif re.match(r'^\d+$', args.hash_or_id):
+    info = api.get_torrent_info(id=args.hash_or_id)
+else:
+    print('Invalid torrent ID or hash', file=sys.stderr)
+    sys.exit(3)
 
 if not info:
     print('Not a music torrent', file=sys.stderr)
-    sys.exit(3)
+    sys.exit(4)
 if args.out:
     with io.open(args.out, 'w', encoding='utf-8') as f:
         f.write(info)
