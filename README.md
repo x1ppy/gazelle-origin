@@ -78,6 +78,16 @@ To save an origin.txt file to the downloaded directory for a particular torrent:
 
     $> ./red-origin C380B62A3EC6658597C56F45D596E8081B3F7A5C <your_cookie_here> -o $HOME/downloads/"Pink Floyd - Dark Side of the Moon (OMR MFSL 24k Gold Ultradisc II) fixed tags"/origin.txt
 
+Obtaining Your Cookie
+---------------------
+`red-origin` requires a browser cookie to log in and make API requests. To obtain your cookie:
+* Open the browser console:
+    * Chrome: Ctrl-Shift-J (Windows) or Command-Option-J (Mac)
+    * Firefox: Ctrl-Shift-K (Windows) or Command-Option-K (Mac)
+* Select the Network tab and refresh the page
+* Select any `.js` or `.php` resource in the list
+* In the right pane, scroll down to "cookie" under "Request Headers". Copy everything after the `session=`. This your personal cookie (keep it secret!)
+
 Other Notes
 -----------
 
