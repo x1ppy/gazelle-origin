@@ -23,6 +23,12 @@ headers = {
     'Accept-Language': 'en-US,en;q=0.8',
     'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3'}
 
+ERR_HASH=3
+ERR_NOT_MUSIC=4
+ERR_LOGIN=5
+ERR_REQUEST=6
+ERR_REQUEST_JSON=7
+
 class RequestException(Exception):
     pass
 
@@ -33,7 +39,6 @@ class RedactedAPI:
         self.session.headers.update(headers)
         self.session_cookie = session_cookie
         self.authkey = None
-        self.last_request = time.time()
         self._login()
 
     def _login(self):
@@ -42,7 +47,13 @@ class RedactedAPI:
         cookies = requests.utils.cookiejar_from_dict(cookiedict)
 
         self.session.cookies.update(cookies)
-        r = self.session.get(mainpage)
+
+        try:
+            self.session.get(mainpage)
+        except:
+            print('Could not log in to RED. Check your session cookie or try again later.', file=sys.stderr)
+            sys.exit(ERR_LOGIN)
+
         accountinfo = self.request('index')
         self.authkey = accountinfo['authkey']
 
@@ -52,15 +63,18 @@ class RedactedAPI:
         if self.authkey:
             params['auth'] = self.authkey
         params.update(kwargs)
+
         r = self.session.get(ajaxpage, params=params, allow_redirects=False)
-        self.last_request = time.time()
-        try:
-            parsed = json.loads(r.content)
-            if parsed['status'] != 'success':
-                raise RequestException
-            return parsed['response']
-        except ValueError:
-            raise RequestException
+        if r.status_code != 200:
+            print('Could not retrieve origin data. Try again later.', file=sys.stderr)
+            sys.exit(ERR_REQUEST)
+
+        parsed = json.loads(r.content)
+        if parsed['status'] != 'success':
+            print('Could not retrieve origin data. Check the torrent ID/hash or try again later.', file=sys.stderr)
+            sys.exit(ERR_REQUEST_JSON)
+
+        return parsed['response']
 
     def get_torrent_info(self, hash=None, id=None):
         info = self.request('torrent', hash=hash, id=id)
@@ -130,11 +144,11 @@ elif re.match(r'^\d+$', args.hash_or_id):
     info = api.get_torrent_info(id=args.hash_or_id)
 else:
     print('Invalid torrent ID or hash', file=sys.stderr)
-    sys.exit(3)
+    sys.exit(ERR_HASH)
 
 if not info:
     print('Not a music torrent', file=sys.stderr)
-    sys.exit(4)
+    sys.exit(ERR_NOT_MUSIC)
 if args.out:
     with io.open(args.out, 'w', encoding='utf-8') as f:
         f.write(info)
