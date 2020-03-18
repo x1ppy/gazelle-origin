@@ -126,7 +126,7 @@ a download finishes. For example, rTorrent users can add something like the
 following to their `~/.rtorrent.rc`:
 
 ~~~
-method.set_key = event.download.finished,postrun,"execute2={sh,~/postdownload.sh,$d.base_path=,$d.hash=}"
+method.set_key = event.download.finished,postrun,"execute2={sh,~/postdownload.sh,$d.base_path=,$d.hash=,$session.path=}"
 ~~~
 
 Then, in `~/postdownload.sh`:
@@ -136,7 +136,8 @@ COOKIE=<your_cookie_here>
 
 BASE_PATH=$1
 INFO_HASH=$2
-if [[ $(find "$BASE_PATH" -iname '*.flac' -o -iname '*.mp3') ]]; then
-    $RED_ORIGIN $COOKIE $INFO_HASH -o "$BASE_PATH"/origin.txt
+SESSION_PATH=$3
+if [[ $(grep flacsfor.me "$SESSION_PATH"/$INFO_HASH.torrent) ]]; then
+    $RED_ORIGIN -o "$BASE_PATH"/origin.txt $COOKIE $INFO_HASH
 fi
 ~~~

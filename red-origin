@@ -100,7 +100,7 @@ class RedactedAPI:
             ('Original year',  group['year']),
             ('Format',         torrent['format']),
             ('Encoding',       torrent['encoding']),
-            ('Log',            '{0}%%'.format(torrent['logScore'] if torrent['hasLog'] else '')),
+            ('Log',            '{0}%'.format(torrent['logScore']) if torrent['hasLog'] else ''),
             ('File count',     torrent['fileCount']),
             ('Size',           torrent['size']),
             ('Info hash',      torrent['infoHash']),
@@ -138,12 +138,12 @@ args = parser.parse_args()
 cookie = args.cookie.replace('session=', '')
 api = RedactedAPI(cookie)
 
-if re.match(r'^[\da-fA-F]{40}$', args.hash_or_id):
-    info = api.get_torrent_info(hash=args.hash_or_id)
-elif re.match(r'^\d+$', args.hash_or_id):
-    info = api.get_torrent_info(id=args.hash_or_id)
+if re.match(r'^[\da-fA-F]{40}$', args.id):
+    info = api.get_torrent_info(hash=args.id)
+elif re.match(r'^\d+$', args.id):
+    info = api.get_torrent_info(id=args.id)
 else:
-    match = re.match(r'.*torrentid=(\d+)', args.hash_or_id)
+    match = re.match(r'.*torrentid=(\d+)', args.id)
     if not match:
         print('Invalid torrent ID or hash', file=sys.stderr)
         sys.exit(ERR_HASH)
