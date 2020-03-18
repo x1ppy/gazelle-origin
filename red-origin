@@ -98,6 +98,8 @@ class RedactedAPI:
             ('Catalog number', torrent['remasterCatalogueNumber']),
             ('Record label',   torrent['remasterRecordLabel']),
             ('Original year',  group['year']),
+            ('Format',         torrent['format']),
+            ('Encoding',       torrent['encoding']),
             ('Log',            '{0}%%'.format(torrent['logScore'] if torrent['hasLog'] else '')),
             ('File count',     torrent['fileCount']),
             ('Size',           torrent['size']),

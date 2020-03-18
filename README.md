@@ -14,6 +14,8 @@ Media           CD
 Catalog number  UDCD 517
 Record label    Mobile Fidelity Sound Lab
 Original year   1973
+Format          FLAC
+Encoding        Lossless
 Log             70%
 File count      12
 Size            219114079
