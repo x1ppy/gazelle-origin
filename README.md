@@ -84,7 +84,8 @@ To save an origin.txt file to the downloaded directory for a particular torrent:
 Obtaining Your Cookie
 ---------------------
 `red-origin` requires a browser cookie to log in and make API requests. To obtain your cookie:
-* Open the browser console:
+* Log in to redacted.ch
+* In the same tab, open the browser console:
     * Chrome: Ctrl-Shift-J (Windows) or Command-Option-J (Mac)
     * Firefox: Ctrl-Shift-K (Windows) or Command-Option-K (Mac)
 * Select the Network tab and refresh the page
@@ -105,5 +106,6 @@ Then, in `~/postdownload.sh`:
 path=$1
 info_hash=$2
 tracker=$3
-[ $tracker == flacsfor.me ] && red-origin <your_cookie_here> $info_hash -o $path/origin.txt
+cookie=<your_cookie_here>
+[ $tracker == flacsfor.me ] && /path/to/red-origin $cookie $info_hash -o "$path"/origin.txt
 ~~~

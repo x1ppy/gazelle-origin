@@ -136,7 +136,8 @@ parser.add_argument('hash_or_id', help='either the info hash of the torrent or t
 parser.add_argument('--out', '-o', help='path to write origin data (default: print to stdout)', metavar='file')
 
 args = parser.parse_args()
-api = RedactedAPI(args.cookie)
+cookie = args.cookie.replace('session=', '')
+api = RedactedAPI(cookie)
 
 if re.match(r'^[\da-fA-F]{40}$', args.hash_or_id):
     info = api.get_torrent_info(hash=args.hash_or_id)
