@@ -90,22 +90,24 @@ Obtaining Your Cookie
     * Firefox: Ctrl-Shift-K (Windows) or Command-Option-K (Mac)
 * Select the Network tab and refresh the page
 * Select any `.js` or `.php` resource in the list
-* In the right pane, scroll down to "cookie" under "Request Headers". Copy everything after the `session=`. This your personal cookie (keep it secret!)
+* In the right pane, scroll down to "cookie" under "Request Headers". Copy
+  everything after the `session=`. This your personal cookie (keep it secret!)
 
 Other Notes
 -----------
 
-`red-origin` is best used when called automatically in your torrent client when a download finishes. For example, rtorrent users can add something like the following to their `~/.rtorrent.rc`:
+`red-origin` is best used when called automatically in your torrent client when
+a download finishes. For example, rTorrent users can add something like the
+following to their `~/.rtorrent.rc`:
 
 ~~~
-method.set_key = event.download.finished,postrun,"execute2={~/postdownload.sh,$d.base_path=,$d.hash=,$d.tracker_domain=}"
+method.set_key = event.download.finished,postrun,"execute2={~/postdownload.sh,$d.base_path=,$d.hash=}"
 ~~~
 
 Then, in `~/postdownload.sh`:
 ~~~
 path=$1
 info_hash=$2
-tracker=$3
 cookie=<your_cookie_here>
-[ $tracker == flacsfor.me ] && /path/to/red-origin $cookie $info_hash -o "$path"/origin.txt
+[[ -z $(find "$path" -iname '*.flac' -o -iname '*.mp3') ]] || /path/to/red-origin $cookie $info_hash -o "$path"/origin.txt
 ~~~

@@ -29,9 +29,6 @@ ERR_LOGIN=5
 ERR_REQUEST=6
 ERR_REQUEST_JSON=7
 
-class RequestException(Exception):
-    pass
-
 # RedactedAPI code is based off of REDbetter (https://github.com/Mechazawa/REDBetter-crawler).
 class RedactedAPI:
     def __init__(self, session_cookie=None):
