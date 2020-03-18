@@ -63,13 +63,13 @@ Usage
 -----
 
 ~~~
-usage: red-origin [-h] [--out file] cookie hash_or_id
+usage: red-origin [-h] [--out file] cookie id
 
 Fetches torrent origin information from redacted.ch
 
 positional arguments:
   cookie               session cookie for logging in to RED
-  hash_or_id           either the info hash of the torrent or the RED torrent ID
+  id                   torrent identifier, which can be either its info hash, torrent ID, or permalink
 
 optional arguments:
   -h, --help           show this help message and exit
@@ -79,9 +79,32 @@ optional arguments:
 Examples
 --------
 
-To save an origin.txt file to the downloaded directory for a particular torrent:
+To show origin information for a given torrent using its info hash:
 
-    $> ./red-origin <your_cookie_here> C380B62A3EC6658597C56F45D596E8081B3F7A5C -o $HOME/downloads/"Pink Floyd - Dark Side of the Moon (OMR MFSL 24k Gold Ultradisc II) fixed tags"/origin.txt
+    $> RED_COOKIE=<your_cookie_here>
+    $> ./red-origin $RED_COOKIE C380B62A3EC6658597C56F45D596E8081B3F7A5C
+
+Alternatively, you can pass the permalink instead of the info hash:
+
+    $> ./red-origin $RED_COOKIE "https://redacted.ch/torrents.php?torrentid=1"
+
+You can even supply just the torrent ID:
+
+    $> ./red-origin $RED_COOKIE 1
+
+Using `-o file`, you can also specify an output file:
+
+    $> ./red-origin -o origin.txt $RED_COOKIE 1
+
+Putting this all together, you can use the following workflow to go through
+your existing downloads and populate them with origin.txt files:
+
+    $> RED_COOKIE=<your_cookie_here>
+    $> cd /path/to/first/torrent
+    $> /path/to/red-origin -o origin.txt $RED_COOKIE "https://redacted.ch/torrents.php?torrentid=1"
+    $> cd /path/to/another/torrent
+    $> /path/to/red-origin -o origin.txt $RED_COOKIE "https://redacted.ch/torrents.php?torrentid=2"
+    $> ...
 
 Obtaining Your Cookie
 ---------------------
@@ -95,21 +118,25 @@ Obtaining Your Cookie
 * In the right pane, scroll down to "cookie" under "Request Headers". Copy
   everything after the `session=`. This your personal cookie (keep it secret!)
 
-Other Notes
------------
+Torrent Client Integration
+--------------------------
 
 `red-origin` is best used when called automatically in your torrent client when
 a download finishes. For example, rTorrent users can add something like the
 following to their `~/.rtorrent.rc`:
 
 ~~~
-method.set_key = event.download.finished,postrun,"execute2={~/postdownload.sh,$d.base_path=,$d.hash=}"
+method.set_key = event.download.finished,postrun,"execute2={sh,~/postdownload.sh,$d.base_path=,$d.hash=}"
 ~~~
 
 Then, in `~/postdownload.sh`:
 ~~~
-path=$1
-info_hash=$2
-cookie=<your_cookie_here>
-[[ -z $(find "$path" -iname '*.flac' -o -iname '*.mp3') ]] || /path/to/red-origin $cookie $info_hash -o "$path"/origin.txt
+RED_ORIGIN=/path/to/red-origin
+COOKIE=<your_cookie_here>
+
+BASE_PATH=$1
+INFO_HASH=$2
+if [[ $(find "$BASE_PATH" -iname '*.flac' -o -iname '*.mp3') ]]; then
+    $RED_ORIGIN $COOKIE $INFO_HASH -o "$BASE_PATH"/origin.txt
+fi
 ~~~

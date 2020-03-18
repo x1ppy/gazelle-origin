@@ -131,7 +131,7 @@ def make_table(arr, ljust):
 formatter_class = argparse.RawDescriptionHelpFormatter
 parser = argparse.ArgumentParser(description='Fetches torrent origin information from redacted.ch', formatter_class=formatter_class)
 parser.add_argument('cookie', help='session cookie for logging in to RED')
-parser.add_argument('hash_or_id', help='either the info hash of the torrent or the RED torrent ID')
+parser.add_argument('id', help='torrent identifier, which can be either its info hash, torrent ID, or permalink')
 parser.add_argument('--out', '-o', help='path to write origin data (default: print to stdout)', metavar='file')
 
 args = parser.parse_args()
@@ -143,8 +143,11 @@ if re.match(r'^[\da-fA-F]{40}$', args.hash_or_id):
 elif re.match(r'^\d+$', args.hash_or_id):
     info = api.get_torrent_info(id=args.hash_or_id)
 else:
-    print('Invalid torrent ID or hash', file=sys.stderr)
-    sys.exit(ERR_HASH)
+    match = re.match(r'.*torrentid=(\d+)', args.hash_or_id)
+    if not match:
+        print('Invalid torrent ID or hash', file=sys.stderr)
+        sys.exit(ERR_HASH)
+    info = api.get_torrent_info(id=match[1])
 
 if not info:
     print('Not a music torrent', file=sys.stderr)
