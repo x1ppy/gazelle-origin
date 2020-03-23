@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 import argparse
+import os
+import re
 import sys
 from redorigin import RedactedAPI, RedactedAPIError
 
 ERR_HASH=3
+ERR_COOKIE=8
 EXIT_CODES = {
     'music': 4,
     'login': 5,
@@ -11,16 +14,20 @@ EXIT_CODES = {
     'request-json': 7,
 }
 
+cookie = os.environ.get('RED_COOKIE')
+if not cookie:
+    print('RED_COOKIE environment variable not set.', file=sys.stderr)
+    sys.exit(ERR_COOKIE)
+
 formatter_class = argparse.RawDescriptionHelpFormatter
 parser = argparse.ArgumentParser(description='Fetches torrent origin information from redacted.ch', formatter_class=formatter_class)
-parser.add_argument('cookie', help='session cookie for logging in to RED')
 parser.add_argument('id', help='torrent identifier, which can be either its info hash, torrent ID, or permalink')
 parser.add_argument('--out', '-o', help='path to write origin data (default: print to stdout)', metavar='file')
 
 args = parser.parse_args()
 
 try:
-    api = RedactedAPI(args.cookie)
+    api = RedactedAPI(cookie)
 
     if re.match(r'^[\da-fA-F]{40}$', args.id):
         info = api.get_torrent_info(hash=args.id)

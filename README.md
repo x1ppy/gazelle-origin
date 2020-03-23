@@ -53,58 +53,20 @@ is far from standard practice. Additionally, using a tool like `red-origin`
 means all torrents will have consistent, parseable origin data independent of
 uploader formatting.
 
-Dependencies
+Installation
 ------------
 
-* Python 3.0 or later
-* `pip install -r requirements.txt`
+Install using `pip`:
 
-Usage
------
+    $> pip install git+https://github.com/x1ppy/red-origin
 
-~~~
-usage: red-origin [-h] [--out file] cookie id
+Then add your RED cookie (see [Obtaining Your Cookie](https://github.com/x1ppy/red-origin#obtaining-your-cookie)) to `~/.bashrc` or equivalent:
 
-Fetches torrent origin information from redacted.ch
+    export RED_COOKIE=<your_cookie_here>
 
-positional arguments:
-  cookie               session cookie for logging in to RED
-  id                   torrent identifier, which can be either its info hash, torrent ID, or permalink
+And reload it:
 
-optional arguments:
-  -h, --help           show this help message and exit
-  --out file, -o file  path to write origin data (default: print to stdout)
-~~~
-
-Examples
---------
-
-To show origin information for a given torrent using its info hash:
-
-    $> RED_COOKIE=<your_cookie_here>
-    $> ./red-origin $RED_COOKIE C380B62A3EC6658597C56F45D596E8081B3F7A5C
-
-Alternatively, you can pass the permalink instead of the info hash:
-
-    $> ./red-origin $RED_COOKIE "https://redacted.ch/torrents.php?torrentid=1"
-
-You can even supply just the torrent ID:
-
-    $> ./red-origin $RED_COOKIE 1
-
-Using `-o file`, you can also specify an output file:
-
-    $> ./red-origin -o origin.txt $RED_COOKIE 1
-
-Putting this all together, you can use the following workflow to go through
-your existing downloads and populate them with origin.txt files:
-
-    $> RED_COOKIE=<your_cookie_here>
-    $> cd /path/to/first/torrent
-    $> /path/to/red-origin -o origin.txt $RED_COOKIE "https://redacted.ch/torrents.php?torrentid=1"
-    $> cd /path/to/another/torrent
-    $> /path/to/red-origin -o origin.txt $RED_COOKIE "https://redacted.ch/torrents.php?torrentid=2"
-    $> ...
+    $> source ~/.bashrc
 
 Obtaining Your Cookie
 ---------------------
@@ -117,6 +79,50 @@ Obtaining Your Cookie
 * Select any `.js` or `.php` resource in the list
 * In the right pane, scroll down to "cookie" under "Request Headers". Copy
   everything after the `session=`. This your personal cookie (keep it secret!)
+
+Usage
+-----
+
+~~~
+usage: red-origin [-h] [--out file] id
+
+Fetches torrent origin information from redacted.ch
+
+positional arguments:
+  id                   torrent identifier, which can be either its info hash, torrent ID, or permalink
+
+optional arguments:
+  -h, --help           show this help message and exit
+  --out file, -o file  path to write origin data (default: print to stdout)
+~~~
+
+Examples
+--------
+
+To show origin information for a given torrent using its info hash:
+
+    $> red-origin C380B62A3EC6658597C56F45D596E8081B3F7A5C
+
+Alternatively, you can pass the permalink instead of the info hash:
+
+    $> red-origin "https://redacted.ch/torrents.php?torrentid=1"
+
+You can even supply just the torrent ID:
+
+    $> red-origin 1
+
+Using `-o file`, you can also specify an output file:
+
+    $> red-origin -o origin.txt 1
+
+Putting this all together, you can use the following workflow to go through
+your existing downloads and populate them with origin.txt files:
+
+    $> cd /path/to/first/torrent
+    $> red-origin -o origin.txt "https://redacted.ch/torrents.php?torrentid=1"
+    $> cd /path/to/another/torrent
+    $> red-origin -o origin.txt "https://redacted.ch/torrents.php?torrentid=2"
+    $> ...
 
 Torrent Client Integration
 --------------------------
@@ -131,13 +137,12 @@ method.set_key = event.download.finished,postrun,"execute2={sh,~/postdownload.sh
 
 Then, in `~/postdownload.sh`:
 ~~~
-RED_ORIGIN=/path/to/red-origin
-COOKIE=<your_cookie_here>
+export RED_COOKIE=<your_cookie_here>
 
 BASE_PATH=$1
 INFO_HASH=$2
 SESSION_PATH=$3
 if [[ $(grep flacsfor.me "$SESSION_PATH"/$INFO_HASH.torrent) ]]; then
-    $RED_ORIGIN -o "$BASE_PATH"/origin.txt $COOKIE $INFO_HASH
+    red-origin -o "$BASE_PATH"/origin.txt $INFO_HASH
 fi
 ~~~
