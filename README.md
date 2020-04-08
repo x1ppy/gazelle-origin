@@ -70,7 +70,7 @@ uploader formatting.
 Supported Trackers
 ------------------
 
-Currently, only redacted.ch is supported. Use `--tracker red` or set the `DEFAULT_TRACKER=red` environment variable to
+Currently, only redacted.ch is supported. Use `--tracker red` or set the `ORIGIN_TRACKER=red` environment variable to
 use it.
 
 Installation
@@ -86,7 +86,7 @@ Then add your tracker cookie (see [Obtaining Your Cookie](https://github.com/x1p
 
 Though not required, it's also recommended that you add a default tracker to `~/.bashrc` or equivalent (see [Supported Trackers](#supported-trackers)):
 
-    export DEFAULT_TRACKER=<tracker>
+    export ORIGIN_TRACKER=<tracker>
 
 And reload it:
 
