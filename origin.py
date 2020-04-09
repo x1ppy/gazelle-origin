@@ -38,16 +38,21 @@ class GazelleAPI:
         self._login()
 
     def _login(self):
-        mainpage = 'https://redacted.ch/';
+        mainpage = 'https://redacted.ch/'
         cookiedict = {"session": self.session_cookie}
         cookies = requests.utils.cookiejar_from_dict(cookiedict)
 
         self.session.cookies.update(cookies)
 
         try:
-            self.session.get(mainpage)
-        except:
-            raise GazelleAPIError('login', 'Could not log in to RED. Check your session cookie or try again later.')
+            res = self.session.get(mainpage, allow_redirects=False)
+            if 'Set-Cookie' in res.headers and 'session=deleted' in res.headers['Set-Cookie']:
+                raise ValueError('invalid')
+        except Exception as e:
+            if isinstance(e, ValueError) and str(e) == 'invalid':
+                raise GazelleAPIError('login', 'Invalid or expired session cookie.')
+            else:
+                raise GazelleAPIError('login', 'Could not log in to RED. Check your session cookie or try again later.')
 
         accountinfo = self.request('index')
         self.authkey = accountinfo['authkey']
