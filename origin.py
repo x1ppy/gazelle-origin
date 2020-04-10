@@ -1,8 +1,5 @@
 import html
-import io
 import json
-import os
-import re
 import requests
 import textwrap
 import yaml
@@ -48,6 +45,8 @@ class GazelleAPI:
             res = self.session.get(mainpage, allow_redirects=False)
             if 'Set-Cookie' in res.headers and 'session=deleted' in res.headers['Set-Cookie']:
                 raise ValueError('invalid')
+            if res.status_code != 200 and res.status_code != 302:
+                raise ValueError()
         except Exception as e:
             if isinstance(e, ValueError) and str(e) == 'invalid':
                 raise GazelleAPIError('login', 'Invalid or expired session cookie.')

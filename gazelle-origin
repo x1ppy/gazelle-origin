@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 import argparse
+from hashlib import sha1
 import io
 import os
 import re
+import subprocess
 import sys
+import yaml
 from origin import GazelleAPI, GazelleAPIError
 
 
@@ -24,14 +27,30 @@ parser = argparse.ArgumentParser(
     epilog='--tracker is optional if the ORIGIN_TRACKER environment variable is set.\n\n'
            'If provided, --tracker must be set to one of the following: red\n'
 )
-parser.add_argument('id', help='torrent identifier, which can be either its info hash, torrent ID, or permalink')
+parser.add_argument('id', nargs='+', help='torrent identifier, which can be either its info hash, torrent ID, permalink, or path to torrent file(s) whose name or computed info hash should be used')
 parser.add_argument('--out', '-o', help='path to write origin data (default: print to stdout)', metavar='file')
 parser.add_argument('--tracker', '-t', nargs=1, metavar='tracker', help='tracker to use')
-parser.add_argument('--env', '-e', nargs=1, metavar='envfile', help='file to load environment variables from')
+parser.add_argument('--env', '-e', nargs=1, metavar='file', help='file to load environment variables from')
+parser.add_argument('--post', '-p', nargs='+', metavar='file', default=[], help='script(s) to run after each output is written.\n'
+                    'These scripts have access to environment variables with info about the item including OUT, ARTIST, NAME, DIRECTORY, EDITION, YEAR, FORMAT, ENCODING')
+parser.add_argument('--recursive', '-r', action='store_true', help='recursively search directories for files')
+parser.add_argument('--no-hash', '-n', action='store_true', help="don't compute hash from torrent files")
 
 args = parser.parse_args()
 
-dotenv = {}
+for script in args.post:
+    if not os.path.isfile(script):
+        print("Invalid post script: " + script)
+        exit(1)
+
+if not args.no_hash:
+    try:
+        import bencoder
+    except ModuleNotFoundError:
+        print("Unable to load bencoder module. Install it (pip install bencoder) or run with --no-hash")
+        exit(1)
+
+dotenv = {"out": args.out if args.out else "stdout"}
 if args.env:
     try:
         with open(args.env[0], 'r') as envfile:
@@ -69,25 +88,54 @@ if tracker.lower() != 'red':
     print('Invalid tracker: {0}'.format(tracker), file=sys.stderr)
     sys.exit(EXIT_CODES['tracker'])
 
+
+def parse_id(id, walk=True, recursive=False):
+    if re.match(r'^[\da-fA-F]{40}$', id):
+        return api.get_torrent_info(hash=id)
+    if re.match(r'^\d+$', id):
+        return api.get_torrent_info(id=id)
+    if os.path.exists(id):
+        if walk and os.path.isdir(id):
+            for path in map(lambda x: os.path.join(id, x), os.listdir(id)):
+                get_torrent_info(path, recursive, recursive)
+            return 'walked'
+        # If file/dir name is info hash use that
+        filename = os.path.split(id)[-1].split('.')[0]
+        if re.match(r'^[\da-fA-F]{40}$', filename):
+            return api.get_torrent_info(hash=filename)
+        # If id is a torrent file compute the info hash
+        if not args.no_hash and os.path.isfile(id) and os.path.split(id)[-1].endswith('.torrent'):
+            with open(id, 'rb') as torrent:
+                decoded = bencoder.decode(torrent.read())
+                info_hash = sha1(bencoder.encode(decoded[b'info'])).hexdigest()
+                return api.get_torrent_info(hash=info_hash)
+    url_match = re.match(r'.*torrentid=(\d+)', arg)
+    if not url_match:
+        return None
+    return api.get_torrent_info(id=url_match[1])
+
+
+def get_torrent_info(id, walk=True, recursive=False):
+    info = parse_id(id, walk, recursive)
+    if info == 'walked':
+        return
+    if not info:
+        print('Invalid torrent ID, hash, or file', file=sys.stderr)
+        sys.exit(EXIT_CODES['hash'])
+    if args.out:
+        with io.open(args.out, 'w', encoding='utf-8') as f:
+            f.write(info)
+    else:
+        print(info, end="")
+    env_info = yaml.load(info, Loader=yaml.SafeLoader)
+    for script in args.post:
+        subprocess.run(script, shell=True, env={**dotenv, **{k.upper(): str(v) for k, v in env_info.items()}})
+
+
 try:
     api = GazelleAPI(cookie)
-
-    if re.match(r'^[\da-fA-F]{40}$', args.id):
-        info = api.get_torrent_info(hash=args.id)
-    elif re.match(r'^\d+$', args.id):
-        info = api.get_torrent_info(id=args.id)
-    else:
-        match = re.match(r'.*torrentid=(\d+)', args.id)
-        if not match:
-            print('Invalid torrent ID or hash', file=sys.stderr)
-            sys.exit(EXIT_CODES['hash'])
-        info = api.get_torrent_info(id=match[1])
+    for arg in args.id:
+        get_torrent_info(arg, True, args.recursive)
 except GazelleAPIError as e:
     print(e, file=sys.stderr)
     sys.exit(EXIT_CODES[e.code])
-
-if args.out:
-    with io.open(args.out, 'w', encoding='utf-8') as f:
-        f.write(info)
-else:
-    print(info, end="")
