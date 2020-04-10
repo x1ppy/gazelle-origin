@@ -65,7 +65,7 @@ class GazelleAPI:
 
         r = self.session.get(ajaxpage, params=params, allow_redirects=False)
         if r.status_code != 200:
-            raise GazelleAPIError('request', 'Could not retrieve origin data. Try again later.')
+            raise GazelleAPIError('request', 'Could not retrieve origin data. Try again later. (status ' + r.status_code + ')')
 
         parsed = json.loads(r.content)
         if parsed['status'] != 'success':

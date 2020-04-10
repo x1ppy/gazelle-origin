@@ -35,6 +35,7 @@ parser.add_argument('--post', '-p', nargs='+', metavar='file', default=[], help=
                     'These scripts have access to environment variables with info about the item including OUT, ARTIST, NAME, DIRECTORY, EDITION, YEAR, FORMAT, ENCODING')
 parser.add_argument('--recursive', '-r', action='store_true', help='recursively search directories for files')
 parser.add_argument('--no-hash', '-n', action='store_true', help="don't compute hash from torrent files")
+parser.add_argument('--ignore-invalid', '-i', action='store_true', help='continue processing other arguments if an invalid id/hash is supplied')
 
 args = parser.parse_args()
 
@@ -106,8 +107,11 @@ def parse_id(id, walk=True, recursive=False):
         # If id is a torrent file compute the info hash
         if not args.no_hash and os.path.isfile(id) and os.path.split(id)[-1].endswith('.torrent'):
             with open(id, 'rb') as torrent:
-                decoded = bencoder.decode(torrent.read())
-                info_hash = sha1(bencoder.encode(decoded[b'info'])).hexdigest()
+                try:
+                    decoded = bencoder.decode(torrent.read())
+                    info_hash = sha1(bencoder.encode(decoded[b'info'])).hexdigest()
+                except:
+                    return None
                 return api.get_torrent_info(hash=info_hash)
     url_match = re.match(r'.*torrentid=(\d+)', arg)
     if not url_match:
@@ -116,11 +120,28 @@ def parse_id(id, walk=True, recursive=False):
 
 
 def get_torrent_info(id, walk=True, recursive=False):
-    info = parse_id(id, walk, recursive)
+    try:
+        info = parse_id(id, walk, recursive)
+    except GazelleAPIError as e:
+        if not args.ignore_invalid:
+            skip = False
+        elif e.code == 'request':
+            # If server returned 500 series error then stop because server might be having trouble
+            skip = int(str(e).split('(status ')[-1][:-1]) >= 500
+        else:
+            skip = e.code == 'request-json'  # Got json but failed to parse required attributes
+        if skip:
+            print('Got %s retrieving %s, skipping' % (str(e), id))
+            return
+        else:
+            print(e, file=sys.stderr)
+            sys.exit(EXIT_CODES[e.code])
     if info == 'walked':
         return
     if not info:
-        print('Invalid torrent ID, hash, or file', file=sys.stderr)
+        print('Invalid torrent ID, hash, or file ' + id, file=sys.stderr)
+        if args.ignore_invalid:
+            return
         sys.exit(EXIT_CODES['hash'])
     if args.out:
         with io.open(args.out, 'w', encoding='utf-8') as f:
@@ -129,13 +150,9 @@ def get_torrent_info(id, walk=True, recursive=False):
         print(info, end="")
     env_info = yaml.load(info, Loader=yaml.SafeLoader)
     for script in args.post:
-        subprocess.run(script, shell=True, env={**dotenv, **{k.upper(): str(v) for k, v in env_info.items()}})
+        subprocess.run(script, shell=True, env={k.upper(): str(v) for k, v in {**dotenv, **env_info}.items()})
 
 
-try:
-    api = GazelleAPI(cookie)
-    for arg in args.id:
-        get_torrent_info(arg, True, args.recursive)
-except GazelleAPIError as e:
-    print(e, file=sys.stderr)
-    sys.exit(EXIT_CODES[e.code])
+api = GazelleAPI(cookie)
+for arg in args.id:
+    get_torrent_info(arg, True, args.recursive)
