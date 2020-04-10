@@ -85,7 +85,7 @@ class GazelleAPI:
         else:
             artists = 'Various Artists'
 
-        dump = yaml.dump({
+        dict = {k:html.unescape(v) if isinstance(v, str) else v for k,v in {
             'Artist':         artists,
             'Name':           group['name'],
             'Edition':        torrent['remasterTitle'],
@@ -103,14 +103,16 @@ class GazelleAPI:
             'Info hash':      torrent['infoHash'],
             'Uploaded':       torrent['time'],
             'Permalink':      'https://redacted.ch/torrents.php?torrentid={0}'.format(torrent['id']),
-        }, width=float('inf'), sort_keys=False, allow_unicode=True)
+        }.items()}
+
+        dump = yaml.dump(dict, width=float('inf'), sort_keys=False, allow_unicode=True)
 
         out = {}
         for line in dump.strip().split('\n'):
             key, value = line.split(':', 1)
             if key == 'Uploaded' or key == 'Encoding':
                 value = value.replace("'", '')
-            out[key] = html.unescape(value.strip())
+            out[key] = value.strip()
 
         result = make_table(out) + '\n'
 
