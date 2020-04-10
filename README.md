@@ -181,3 +181,16 @@ if [[ $(grep flacsfor.me "$SESSION_PATH"/$INFO_HASH.torrent) ]]; then
     gazelle-origin -t red -o "$BASE_PATH"/origin.yaml $INFO_HASH
 fi
 ~~~
+
+Changelog
+---------
+### [2.0.1] - 2020-04-10
+* Fixed YAML generation bug for fields starting with quotes
+### [2.0.0] - 2020-04-08
+* Renamed to `gazelle-origin` and switched to YAML output
+### [1.0.0] - 2020-03-24
+* First tagged release
+
+[2.0.1]: https://github.com/x1ppy/gazelle-origin/compare/2.0.0...2.0.1
+[2.0.0]: https://github.com/x1ppy/gazelle-origin/compare/1.0.0...2.0.0
+[1.0.0]: https://github.com/x1ppy/gazelle-origin/releases/tag/1.0.0
