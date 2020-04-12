@@ -184,6 +184,8 @@ fi
 
 Changelog
 ---------
+### [2.0.2] - 2020-04-11
+* Added timeout for requests
 ### [2.0.1] - 2020-04-10
 * Fixed YAML generation bug for fields starting with quotes
 ### [2.0.0] - 2020-04-08
@@ -191,6 +193,7 @@ Changelog
 ### [1.0.0] - 2020-03-24
 * First tagged release
 
+[2.0.2]: https://github.com/x1ppy/gazelle-origin/compare/2.0.1...2.0.2
 [2.0.1]: https://github.com/x1ppy/gazelle-origin/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/x1ppy/gazelle-origin/compare/1.0.0...2.0.0
 [1.0.0]: https://github.com/x1ppy/gazelle-origin/releases/tag/1.0.0

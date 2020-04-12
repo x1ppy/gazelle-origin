@@ -45,7 +45,7 @@ class GazelleAPI:
         self.session.cookies.update(cookies)
 
         try:
-            self.session.get(mainpage)
+            self.session.get(mainpage, timeout=30)
         except:
             raise GazelleAPIError('login', 'Could not log in to RED. Check your session cookie or try again later.')
 
@@ -59,7 +59,7 @@ class GazelleAPI:
             params['auth'] = self.authkey
         params.update(kwargs)
 
-        r = self.session.get(ajaxpage, params=params, allow_redirects=False)
+        r = self.session.get(ajaxpage, params=params, allow_redirects=False, timeout=30)
         if r.status_code != 200:
             raise GazelleAPIError('request', 'Could not retrieve origin data. Try again later.')
 
