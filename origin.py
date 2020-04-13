@@ -30,38 +30,24 @@ class GazelleAPIError(Exception):
 
 # GazelleAPI code is based off of REDbetter (https://github.com/Mechazawa/REDBetter-crawler).
 class GazelleAPI:
-    def __init__(self, session_cookie=None):
+    def __init__(self, api_key):
         self.session = requests.Session()
         self.session.headers.update(headers)
-        self.session_cookie = session_cookie.replace('session=', '')
-        self.authkey = None
-        self._login()
-
-    def _login(self):
-        mainpage = 'https://redacted.ch/';
-        cookiedict = {"session": self.session_cookie}
-        cookies = requests.utils.cookiejar_from_dict(cookiedict)
-
-        self.session.cookies.update(cookies)
-
-        try:
-            self.session.get(mainpage, timeout=30)
-        except:
-            raise GazelleAPIError('login', 'Could not log in to RED. Check your session cookie or try again later.')
-
-        accountinfo = self.request('index')
-        self.authkey = accountinfo['authkey']
+        self.session.headers.update({'Authorization': api_key})
 
     def request(self, action, **kwargs):
         ajaxpage = 'https://redacted.ch/ajax.php'
         params = {'action': action}
-        if self.authkey:
-            params['auth'] = self.authkey
         params.update(kwargs)
 
         r = self.session.get(ajaxpage, params=params, allow_redirects=False, timeout=30)
+        if r.status_code == 401:
+            raise GazelleAPIError('unauthorized', 'Invalid API key.')
+        if r.status_code == 403:
+            raise GazelleAPIError('unauthorized', 'API key needs Torrents permission.')
         if r.status_code != 200:
-            raise GazelleAPIError('request', 'Could not retrieve origin data. Try again later.')
+            raise GazelleAPIError('request',
+                'Could not retrieve origin data. Try again later. (status {0})'.format(r.status_code))
 
         parsed = json.loads(r.content)
         if parsed['status'] != 'success':

@@ -80,9 +80,9 @@ Install using `pip`:
 
     $> pip install git+https://github.com/x1ppy/gazelle-origin
 
-Then add your tracker cookie (see [Obtaining Your Cookie](https://github.com/x1ppy/gazelle-origin#obtaining-your-cookie)) to `~/.bashrc` or equivalent:
+Then add your tracker API key (see [Obtaining Your API Key](https://github.com/x1ppy/gazelle-origin#obtaining-your-api-key)) to `~/.bashrc` or equivalent:
 
-    export RED_COOKIE=<your_cookie_here>
+    export RED_API_KEY=<your_api_key_here>
 
 Though not required, it's also recommended that you add a default tracker to `~/.bashrc` or equivalent (see [Supported Trackers](#supported-trackers)):
 
@@ -92,18 +92,23 @@ And reload it:
 
     $> source ~/.bashrc
 
-Obtaining Your Cookie
+Obtaining Your API Key
 ---------------------
+`gazelle-origin` requires an API key to make API requests. To obtain your API key:
+
 ### redacted.ch
-`gazelle-origin` requires a browser cookie to log in and make API requests. To obtain your cookie:
-* Log in to redacted.ch
-* In the same tab, open the browser console:
-    * Chrome: Ctrl-Shift-J (Windows) or Command-Option-J (Mac)
-    * Firefox: Ctrl-Shift-K (Windows) or Command-Option-K (Mac)
-* Select the Network tab and refresh the page
-* Select any `.js` or `.php` resource in the list
-* In the right pane, scroll down to "cookie" under "Request Headers". Copy
-  everything after the `session=`. This your personal cookie (keep it secret!)
+* Go to your profile and select Access Settings on the right side
+* Scroll down to API Keys
+* Enter "gazelle-origin" as the name
+* Uncheck all boxes except Torrents
+* Copy all of the text in the Key: box (this is your API key)
+* Check Confirm API Key and save
+
+Before saving, the fields should look like this:
+![before saving](docs/api-checkboxes.png "Before saving")
+
+After saving, you should see a Torrents API key like this:
+![after saving](docs/api-done.png "After saving")
 
 Usage
 -----
@@ -172,7 +177,7 @@ method.set_key = event.download.finished,postrun,"execute2={sh,~/postdownload.sh
 
 Then, in `~/postdownload.sh`:
 ~~~
-export RED_COOKIE=<your_cookie_here>
+export RED_API_KEY=<your_api_key_here>
 
 BASE_PATH=$1
 INFO_HASH=$2
@@ -184,6 +189,8 @@ fi
 
 Changelog
 ---------
+### [2.0.3] - 2020-04-13
+* Replaced cookie with API key
 ### [2.0.2] - 2020-04-11
 * Added timeout for requests
 ### [2.0.1] - 2020-04-10
@@ -193,6 +200,7 @@ Changelog
 ### [1.0.0] - 2020-03-24
 * First tagged release
 
+[2.0.3]: https://github.com/x1ppy/gazelle-origin/compare/2.0.2...2.0.3
 [2.0.2]: https://github.com/x1ppy/gazelle-origin/compare/2.0.1...2.0.2
 [2.0.1]: https://github.com/x1ppy/gazelle-origin/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/x1ppy/gazelle-origin/compare/1.0.0...2.0.0
