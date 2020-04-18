@@ -189,6 +189,8 @@ fi
 
 Changelog
 ---------
+### [2.0.4] - 2020-04-18
+* Fixed YAML generation for comments containing whitespace-only lines
 ### [2.0.3] - 2020-04-13
 * Replaced cookie with API key
 ### [2.0.2] - 2020-04-11
@@ -200,6 +202,7 @@ Changelog
 ### [1.0.0] - 2020-03-24
 * First tagged release
 
+[2.0.4]: https://github.com/x1ppy/gazelle-origin/compare/2.0.3...2.0.4
 [2.0.3]: https://github.com/x1ppy/gazelle-origin/compare/2.0.2...2.0.3
 [2.0.2]: https://github.com/x1ppy/gazelle-origin/compare/2.0.1...2.0.2
 [2.0.1]: https://github.com/x1ppy/gazelle-origin/compare/2.0.0...2.0.1

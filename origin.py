@@ -104,7 +104,7 @@ class GazelleAPI:
 
         comment = html.unescape(torrent['description']).strip('\r\n')
         if comment:
-            comment = textwrap.indent(comment, '  ')
+            comment = textwrap.indent(comment, '  ', lambda line: True)
             result += 'Comment: |-\n{0}\n\n'.format(comment)
 
         out = []

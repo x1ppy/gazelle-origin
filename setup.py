@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="gazelle-origin",
-    version="2.0.3",
+    version="2.0.4",
     author="x1ppy",
     author_email="",
     packages=[''],
