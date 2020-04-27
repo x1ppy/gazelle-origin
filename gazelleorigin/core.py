@@ -55,6 +55,15 @@ class GazelleAPI:
 
         return parsed['response']
 
+    def _make_table(self, dict):
+        k_width = max(len(html.unescape(k)) for k in dict.keys()) + 2
+        result = ''
+        for k,v in dict.items():
+            if v == "''":
+                v = '~'
+            result += "".join((html.unescape((k + ':').ljust(k_width)), v)) + '\n'
+        return result
+
     def get_torrent_info(self, hash=None, id=None):
         info = self.request('torrent', hash=hash, id=id)
         group = info['group']
@@ -100,7 +109,7 @@ class GazelleAPI:
                 value = value.replace("'", '')
             out[key] = value.strip()
 
-        result = make_table(out) + '\n'
+        result = self._make_table(out) + '\n'
 
         comment = html.unescape(torrent['description']).strip('\r\n')
         if comment:
@@ -114,12 +123,3 @@ class GazelleAPI:
         result += yaml.dump({'Files': out}, width=float('inf'), allow_unicode=True)
 
         return result
-
-def make_table(dict):
-    k_width = max(len(html.unescape(k)) for k in dict.keys()) + 2
-    result = ''
-    for k,v in dict.items():
-        if v == "''":
-            v = '~'
-        result += "".join((html.unescape((k + ':').ljust(k_width)), v)) + '\n'
-    return result
