@@ -20,28 +20,32 @@ EXIT_CODES = {
 parser = argparse.ArgumentParser(
     description='Fetches torrent origin information from Gazelle-based music trackers',
     formatter_class=argparse.RawDescriptionHelpFormatter,
-    epilog='--tracker is optional if the ORIGIN_TRACKER environment variable is set.\n\n'
-           'If provided, --tracker must be set to one of the following: red\n'
+    epilog='Either ORIGIN_TRACKER or --tracker must be set to a supported tracker:\n'
+           '  redacted.ch: "RED" or "flacsfor.me"'
 )
-parser.add_argument('id', help='torrent identifier, which can be either its info hash, torrent ID, or permalink')
-parser.add_argument('--out', '-o', help='path to write origin data (default: print to stdout)', metavar='file')
-parser.add_argument('--tracker', '-t', nargs=1, metavar='tracker', help='tracker to use')
+parser.add_argument('id', help='Torrent identifier, which can be either its info hash,\n'
+                               'torrent ID, or permalink.')
+parser.add_argument('--out', '-o', help='Path to write origin data (default: print to stdout).', metavar='file')
+parser.add_argument('--tracker', '-t', metavar='tracker',
+    help='Tracker to use. Optional if the ORIGIN_TRACKER environment variable is set.')
+parser.add_argument('--api-key', metavar='key',
+    help='API key. Optional if the <TRACKER>_API_KEY (e.g., RED_API_KEY) environment variable is set.')
 
 
 def main():
     args = parser.parse_args()
 
-    api_key = os.environ.get('RED_API_KEY')
+    api_key = args.api_key if args.api_key else os.environ.get('RED_API_KEY')
     if not api_key:
-        print('RED_API_KEY environment variable not set.', file=sys.stderr)
+        print('API key must be provided using either --api-key or setting the <TRACKER>_API_KEY environment variable.', file=sys.stderr)
         sys.exit(EXIT_CODES['api-key'])
 
-    tracker = args.tracker[0] if args.tracker else os.environ.get('ORIGIN_TRACKER')
+    tracker = args.tracker if args.tracker else os.environ.get('ORIGIN_TRACKER')
     if not tracker:
         print('Tracker must be provided using either --tracker or setting the ORIGIN_TRACKER environment variable.',
                 file=sys.stderr)
         sys.exit(EXIT_CODES['tracker'])
-    if tracker.lower() != 'red':
+    if tracker.lower() != 'red' and tracker.lower() != 'flacsfor.me':
         print('Invalid tracker: {0}'.format(tracker), file=sys.stderr)
         sys.exit(EXIT_CODES['tracker'])
 
