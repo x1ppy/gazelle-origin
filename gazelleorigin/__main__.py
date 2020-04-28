@@ -21,7 +21,7 @@ parser = argparse.ArgumentParser(
     description='Fetches torrent origin information from Gazelle-based music trackers',
     formatter_class=argparse.RawDescriptionHelpFormatter,
     epilog='Either ORIGIN_TRACKER or --tracker must be set to a supported tracker:\n'
-           '  redacted.ch: "RED" or "flacsfor.me"'
+           '  redacted.ch: "RED", or any string containing "flacsfor.me"'
 )
 parser.add_argument('id', help='Torrent identifier, which can be either its info hash,\n'
                                'torrent ID, or permalink.')
@@ -45,7 +45,7 @@ def main():
         print('Tracker must be provided using either --tracker or setting the ORIGIN_TRACKER environment variable.',
                 file=sys.stderr)
         sys.exit(EXIT_CODES['tracker'])
-    if tracker.lower() != 'red' and tracker.lower() != 'flacsfor.me':
+    if tracker.lower() != 'red' and 'flacsfor.me' not in tracker.lower():
         print('Invalid tracker: {0}'.format(tracker), file=sys.stderr)
         sys.exit(EXIT_CODES['tracker'])
 
