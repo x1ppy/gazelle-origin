@@ -60,7 +60,8 @@ Motivation
 Having origin information locally available for each downloaded torrent has a number of benefits:
   * music can be retagged and renamed without losing immediate access to original metadata,
   * if the tracker is ever down or goes away, the origin information is still available, and
-  * origin information can be passed to other scripts/tools (e.g., beets) to more accurately identify your music.
+  * origin information can be passed to other scripts/tools (e.g., beets) to more accurately identify your music (see
+    [beets integration](#beets)).
 
 While some uploaders helpfully include this information in their uploads, this
 is far from standard practice. Additionally, using a tool like `gazelle-origin`
@@ -80,9 +81,9 @@ Install using `pip`:
 
     $> pip install git+https://github.com/x1ppy/gazelle-origin
 
-Then add your tracker cookie (see [Obtaining Your Cookie](https://github.com/x1ppy/gazelle-origin#obtaining-your-cookie)) to `~/.bashrc` or equivalent:
+Then add your tracker API key (see [Obtaining Your API Key](https://github.com/x1ppy/gazelle-origin#obtaining-your-api-key)) to `~/.bashrc` or equivalent:
 
-    export RED_COOKIE=<your_cookie_here>
+    export RED_API_KEY=<api_key>
 
 Though not required, it's also recommended that you add a default tracker to `~/.bashrc` or equivalent (see [Supported Trackers](#supported-trackers)):
 
@@ -92,18 +93,25 @@ And reload it:
 
     $> source ~/.bashrc
 
-Obtaining Your Cookie
+Finally, see [Integration](#torrent-clients) for calling `gazelle-origin` automatically from your torrent client.
+
+Obtaining Your API Key
 ---------------------
+`gazelle-origin` requires an API key to make API requests. To obtain your API key:
+
 ### redacted.ch
-`gazelle-origin` requires a browser cookie to log in and make API requests. To obtain your cookie:
-* Log in to redacted.ch
-* In the same tab, open the browser console:
-    * Chrome: Ctrl-Shift-J (Windows) or Command-Option-J (Mac)
-    * Firefox: Ctrl-Shift-K (Windows) or Command-Option-K (Mac)
-* Select the Network tab and refresh the page
-* Select any `.js` or `.php` resource in the list
-* In the right pane, scroll down to "cookie" under "Request Headers". Copy
-  everything after the `session=`. This your personal cookie (keep it secret!)
+* Go to your profile and select Access Settings on the right side
+* Scroll down to API Keys
+* Enter "gazelle-origin" as the name
+* Uncheck all boxes except Torrents
+* Copy all of the text in the Key: box (this is your API key)
+* Check Confirm API Key and save
+
+Before saving, the fields should look like this:
+![before saving](docs/api-checkboxes.png "Before saving")
+
+After saving, you should see a Torrents API key like this:
+![after saving](docs/api-done.png "After saving")
 
 Usage
 -----
@@ -111,12 +119,12 @@ Usage
 ~~~
 usage: gazelle-origin [-h] [--out file] [--tracker tracker] [--env file]
                       [--post file [file ...]] [--recursive] [--no-hash]
-                      id [id ...]
+                      torrent [torrent ...]
 
 Fetches torrent origin information from Gazelle-based music trackers
 
 positional arguments:
-  id                    torrent identifier, which can be either its info hash,
+  torrent               torrent identifier, which can be either its info hash,
                         torrent ID, permalink, or path to torrent file(s)
                         whose name or computed info hash should be used
 
@@ -189,8 +197,15 @@ Or you can manually go through your existing downloads and populate them with or
     $> gazelle-origin -o origin.yaml "https://redacted.ch/torrents.php?torrentid=2"
     $> ...
 
-Torrent Client Integration
---------------------------
+Integration
+-----------
+
+### Torrent clients
+
+`gazelle-origin` is best used when called automatically in your torrent client when a download finishes. Use the
+following snippets to integrate `gazelle-origin` into your client. If your client isn't listed, please file a PR!
+
+#### rtorrent
 
 `gazelle-origin` is best used when called automatically in your torrent client when
 a download finishes. For example, rTorrent users can add something like the
@@ -202,7 +217,7 @@ method.set_key = event.download.finished,postrun,"execute2={sh,~/postdownload.sh
 
 Then, in `~/postdownload.sh`:
 ~~~
-export RED_COOKIE=<your_cookie_here>
+export RED_API_KEY=<api_key>
 
 BASE_PATH=$1
 INFO_HASH=$2
@@ -211,3 +226,59 @@ if [[ $(grep flacsfor.me "$SESSION_PATH"/$INFO_HASH.torrent) ]]; then
     gazelle-origin -t red -o "$BASE_PATH"/origin.yaml $INFO_HASH
 fi
 ~~~
+
+#### qBittorrent
+
+In Options > Downloads > Run an external program on torrent completion, enter the following:
+
+    gazelle-origin -t %T -o "%R/origin.yaml" --api-key <api_key> %I
+
+Note that this assumes Python has been added to your environment path. If not and you're a Windows user, you can
+fix this by enabling the checkbox at:
+_Start > Settings > Apps & Features > Python > Modify > Modify > Next > Add Python to environment variables_.
+
+### beets
+
+Origin files can also be used by beets to significantly improve autotagger results. To do so, install the
+[beets-originquery](https://github.com/x1ppy/beets-originquery) plugin, using the following configuration:
+
+~~~
+originquery:
+    origin_file: origin.yaml
+    tag_patterns:
+        media: '$.Media'
+        year: '$."Edition year"'
+        label: '$."Record label"'
+        catalognum: '$."Catalog number"'
+        albumdisambig: '$.Edition'
+~~~
+
+Changelog
+---------
+### [2.1.1] - 2020-04-27
+* Accept any string containing "flacsfor.me" as RED tracker ID
+### [2.1.0] - 2020-04-27
+* Added `--api-key` to allow specifying API key on execution
+* Accept "flacsfor.me" as a RED tracker ID
+* More sane package organization
+### [2.0.4] - 2020-04-18
+* Fixed YAML generation for comments containing whitespace-only lines
+### [2.0.3] - 2020-04-13
+* Replaced cookie with API key
+### [2.0.2] - 2020-04-11
+* Added timeout for requests
+### [2.0.1] - 2020-04-10
+* Fixed YAML generation bug for fields starting with quotes
+### [2.0.0] - 2020-04-08
+* Renamed to `gazelle-origin` and switched to YAML output
+### [1.0.0] - 2020-03-24
+* First tagged release
+
+[2.1.1]: https://github.com/x1ppy/gazelle-origin/compare/2.1.0...2.1.1
+[2.1.0]: https://github.com/x1ppy/gazelle-origin/compare/2.0.4...2.1.0
+[2.0.4]: https://github.com/x1ppy/gazelle-origin/compare/2.0.3...2.0.4
+[2.0.3]: https://github.com/x1ppy/gazelle-origin/compare/2.0.2...2.0.3
+[2.0.2]: https://github.com/x1ppy/gazelle-origin/compare/2.0.1...2.0.2
+[2.0.1]: https://github.com/x1ppy/gazelle-origin/compare/2.0.0...2.0.1
+[2.0.0]: https://github.com/x1ppy/gazelle-origin/compare/1.0.0...2.0.0
+[1.0.0]: https://github.com/x1ppy/gazelle-origin/releases/tag/1.0.0

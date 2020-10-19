@@ -8,7 +8,7 @@ import yaml
 headers = {
     'Connection': 'keep-alive',
     'Cache-Control': 'max-age=0',
-    'User-Agent': 'red-origin',
+    'User-Agent': 'gazelle-origin',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
     'Accept-Encoding': 'gzip,deflate,sdch',
     'Accept-Language': 'en-US,en;q=0.8',
@@ -27,51 +27,39 @@ class GazelleAPIError(Exception):
 
 # GazelleAPI code is based off of REDbetter (https://github.com/Mechazawa/REDBetter-crawler).
 class GazelleAPI:
-    def __init__(self, session_cookie=None):
+    def __init__(self, api_key):
         self.session = requests.Session()
         self.session.headers.update(headers)
-        self.session_cookie = session_cookie.replace('session=', '')
-        self.authkey = None
-        self._login()
-
-    def _login(self):
-        mainpage = 'https://redacted.ch/'
-        cookiedict = {"session": self.session_cookie}
-        cookies = requests.utils.cookiejar_from_dict(cookiedict)
-
-        self.session.cookies.update(cookies)
-
-        try:
-            res = self.session.get(mainpage, allow_redirects=False)
-            if 'Set-Cookie' in res.headers and 'session=deleted' in res.headers['Set-Cookie']:
-                raise ValueError('invalid')
-            if res.status_code != 200 and res.status_code != 302:
-                raise ValueError()
-        except Exception as e:
-            if isinstance(e, ValueError) and str(e) == 'invalid':
-                raise GazelleAPIError('login', 'Invalid or expired session cookie.')
-            else:
-                raise GazelleAPIError('login', 'Could not log in to RED. Check your session cookie or try again later.')
-
-        accountinfo = self.request('index')
-        self.authkey = accountinfo['authkey']
+        self.session.headers.update({'Authorization': api_key})
 
     def request(self, action, **kwargs):
         ajaxpage = 'https://redacted.ch/ajax.php'
         params = {'action': action}
-        if self.authkey:
-            params['auth'] = self.authkey
         params.update(kwargs)
 
-        r = self.session.get(ajaxpage, params=params, allow_redirects=False)
+        r = self.session.get(ajaxpage, params=params, allow_redirects=False, timeout=30)
+        if r.status_code == 401:
+            raise GazelleAPIError('unauthorized', 'Invalid API key.')
+        if r.status_code == 403:
+            raise GazelleAPIError('unauthorized', 'API key needs Torrents permission.')
         if r.status_code != 200:
-            raise GazelleAPIError('request', 'Could not retrieve origin data. Try again later. (status ' + r.status_code + ')')
+            raise GazelleAPIError('request',
+                'Could not retrieve origin data. Try again later. (status {0})'.format(r.status_code))
 
         parsed = json.loads(r.content)
         if parsed['status'] != 'success':
             raise GazelleAPIError('request-json', 'Could not retrieve origin data. Check the torrent ID/hash or try again later.')
 
         return parsed['response']
+
+    def _make_table(self, dict):
+        k_width = max(len(html.unescape(k)) for k in dict.keys()) + 2
+        result = ''
+        for k,v in dict.items():
+            if v == "''":
+                v = '~'
+            result += "".join((html.unescape((k + ':').ljust(k_width)), v)) + '\n'
+        return result
 
     def get_torrent_info(self, hash=None, id=None):
         info = self.request('torrent', hash=hash, id=id)
@@ -89,7 +77,7 @@ class GazelleAPI:
         else:
             artists = 'Various Artists'
 
-        dump = yaml.dump({
+        dict = {k:html.unescape(v) if isinstance(v, str) else v for k,v in {
             'Artist':         artists,
             'Name':           group['name'],
             'Edition':        torrent['remasterTitle'],
@@ -107,20 +95,22 @@ class GazelleAPI:
             'Info hash':      torrent['infoHash'],
             'Uploaded':       torrent['time'],
             'Permalink':      'https://redacted.ch/torrents.php?torrentid={0}'.format(torrent['id']),
-        }, width=float('inf'), sort_keys=False, allow_unicode=True)
+        }.items()}
+
+        dump = yaml.dump(dict, width=float('inf'), sort_keys=False, allow_unicode=True)
 
         out = {}
         for line in dump.strip().split('\n'):
             key, value = line.split(':', 1)
             if key == 'Uploaded' or key == 'Encoding':
                 value = value.replace("'", '')
-            out[key] = html.unescape(value.strip())
+            out[key] = value.strip()
 
-        result = make_table(out) + '\n'
+        result = self._make_table(out) + '\n'
 
         comment = html.unescape(torrent['description']).strip('\r\n')
         if comment:
-            comment = textwrap.indent(comment, '  ')
+            comment = textwrap.indent(comment, '  ', lambda line: True)
             result += 'Comment: |-\n{0}\n\n'.format(comment)
 
         out = []
@@ -130,12 +120,3 @@ class GazelleAPI:
         result += yaml.dump({'Files': out}, width=float('inf'), allow_unicode=True)
 
         return result
-
-def make_table(dict):
-    k_width = max(len(html.unescape(k)) for k in dict.keys()) + 2
-    result = ''
-    for k,v in dict.items():
-        if v == "''":
-            v = '~'
-        result += "".join((html.unescape((k + ':').ljust(k_width)), v)) + '\n'
-    return result
