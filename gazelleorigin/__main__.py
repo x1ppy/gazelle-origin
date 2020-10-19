@@ -192,7 +192,7 @@ def handle_input_torrent(torrent, walk=True, recursive=False):
             # If server returned 500 series error then stop because server might be having trouble
             skip = int(str(e).split('(status ')[-1][:-1]) >= 500
         else:
-            skip = e.code == 'request-json'  # Got json but failed to parse required attributes
+            skip = e.code == 'request-json' or e.code == 'music'
         if skip:
             print('Got %s retrieving %s, skipping' % (str(e), torrent))
             return
