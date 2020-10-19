@@ -39,10 +39,12 @@ parser.add_argument('--post', '-p', nargs='+', metavar='file', default=[], help=
 parser.add_argument('--recursive', '-r', action='store_true', help='recursively search directories for files')
 parser.add_argument('--no-hash', '-n', action='store_true', help='don\'t compute hash from torrent files')
 parser.add_argument('--ignore-invalid', '-i', action='store_true', help='continue processing other arguments if an invalid id/hash is supplied')
+parser.add_argument('--deduplicate', '-d', action='store_true', help='if specified, only one torrent with any given id/hash will be fetched')
 
 
 api = None
 args = None
+fetched = {}
 environment = {}
 
 
@@ -169,6 +171,16 @@ def handle_input_torrent(torrent, walk=True, recursive=False):
         if args.ignore_invalid:
             return
         sys.exit(EXIT_CODES['hash'])
+
+    if args.deduplicate:
+        if 'id' in parsed:
+            if parsed['id'] in fetched:
+                return
+            fetched[parsed['id']] = True
+        if 'hash' in parsed:
+            if parsed['hash'] in fetched:
+                return
+            fetched[parsed['hash']] = True
 
     # Actually get the info from the API
     try:
