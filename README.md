@@ -117,18 +117,30 @@ Usage
 -----
 
 ~~~
-usage: gazelle-origin [-h] [--out file] [--tracker tracker] id
+usage: gazelle-origin [-h] [--out file] [--tracker tracker] [--env file]
+                      [--post file [file ...]] [--recursive] [--no-hash]
+                      torrent [torrent ...]
 
 Fetches torrent origin information from Gazelle-based music trackers
 
 positional arguments:
-  id                    torrent identifier, which can be either its info hash, torrent ID, or permalink
+  torrent               torrent identifier, which can be either its info hash,
+                        torrent ID, permalink, or path to torrent file(s)
+                        whose name or computed info hash should be used
 
 optional arguments:
   -h, --help            show this help message and exit
   --out file, -o file   path to write origin data (default: print to stdout)
   --tracker tracker, -t tracker
                         tracker to use
+  --env file, -e file   file to load environment variables from
+  --post file [file ...], -p file [file ...]
+                        script(s) to run after each output is written. These
+                        scripts have access to environment variables with info
+                        about the item including OUT, ARTIST, NAME, DIRECTORY,
+                        EDITION, YEAR, FORMAT, ENCODING
+  --recursive, -r       recursively search directories for files
+  --no-hash, -n         don't compute hash from torrent files
 
 --tracker is optional if the ORIGIN_TRACKER environment variable is set.
 
@@ -154,12 +166,30 @@ You can even supply just the torrent ID:
 
     $> gazelle-origin 1
 
-Using `-o file`, you can also specify an output file:
+You can also pass a file or directory. If the file/directory has an info hash in its name that will be used,
+or if it is a torrent file its info hash will be computed and used. If a directory is given it will be searched and
+each file in it will be looked up as if it were passed as an argument.
+
+    $> gazelle-origin "./Pink Floyd The Wall.torrent"
+    $> gazelle-origin ./899350BAF9F3671FE6E0817CBA7B9796E70DD924.torrent
+    $> gazelle-origin ./torrents
+
+Using `-o file`, you can specify an output file:
 
     $> gazelle-origin -o origin.yaml 1
 
-Putting this all together, you can use the following workflow to go through
-your existing downloads and populate them with origin.yaml files:
+Using `-p file`, you can specify a file to run after each output is saved. This program has access to information
+about the downloaded torrent and the output file through environment variables including OUT, ARTIST, NAME, DIRECTORY, EDITION, YEAR, FORMAT, ENCODING.
+
+    $> gazelle-origin -o origin.yaml 1 -p ./post.sh
+
+You can use post scripts to populate your existing library with origin.yaml files using the info hashes of all your snatched torrents.
+If all of your torrents are in `./torrents/`, the corresponding data is in `/music/`, and you have a script `./script.sh` containing `mv $OUT "/music/$DIRECTORY/$OUT"`,
+then you could run
+
+    $> gazelle-origin -o origin.yaml ./torrents -p ./script.sh
+
+Or you can manually go through your existing downloads and populate them with origin.yaml files:
 
     $> cd /path/to/first/torrent
     $> gazelle-origin -o origin.yaml "https://redacted.ch/torrents.php?torrentid=1"
