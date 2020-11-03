@@ -255,6 +255,8 @@ originquery:
 
 Changelog
 ---------
+### [2.2.0] - 2020-11-02
+* Add support for multiple inputs, files/directories, env file, and post scripts (thanks @a8f!)
 ### [2.1.1] - 2020-04-27
 * Accept any string containing "flacsfor.me" as RED tracker ID
 ### [2.1.0] - 2020-04-27
@@ -274,6 +276,7 @@ Changelog
 ### [1.0.0] - 2020-03-24
 * First tagged release
 
+[2.2.0]: https://github.com/x1ppy/gazelle-origin/compare/2.1.1...2.2.0
 [2.1.1]: https://github.com/x1ppy/gazelle-origin/compare/2.1.0...2.1.1
 [2.1.0]: https://github.com/x1ppy/gazelle-origin/compare/2.0.4...2.1.0
 [2.0.4]: https://github.com/x1ppy/gazelle-origin/compare/2.0.3...2.0.4
