@@ -38,10 +38,8 @@ class GazelleAPI:
         params.update(kwargs)
 
         r = self.session.get(ajaxpage, params=params, allow_redirects=False, timeout=30)
-        if r.status_code == 401:
-            raise GazelleAPIError('unauthorized', 'Invalid API key.')
-        if r.status_code == 403:
-            raise GazelleAPIError('unauthorized', 'API key needs Torrents permission.')
+        if r.status_code == 401 or r.status_code == 403:
+            raise GazelleAPIError('unauthorized', 'Authentication error: ' + r.json()['error'])
         if r.status_code != 200:
             raise GazelleAPIError('request',
                 'Could not retrieve origin data. Try again later. (status {0})'.format(r.status_code))

@@ -153,7 +153,7 @@ def parse_torrent_input(torrent, walk=True, recursive=False):
                 return {'hash': info_hash}
     # torrent is a URL
     url_match = re.match(r'.*torrentid=(\d+).*', torrent)
-    if not url_match or len(url_match) < 2:
+    if not url_match or url_match.lastindex < 1:
         return None
     return {'id': url_match[1]}
 
