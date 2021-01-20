@@ -235,7 +235,29 @@ In Options > Downloads > Run an external program on torrent completion, enter th
 
 To avoid triggering the script for unsupported trackers, an alternative script can be used. Update the file and folder name as necessary:
 
-    bash /config/qb-gazelle-origin.sh "%R" %I %T "%L"
+    bash qb-gazelle-origin.sh "%R" %I %T "%L"
+    
+Then, create a script as follows named qb-gazelle-origin.sh:
+
+~~~
+#!/bin/bash
+# We must accommodate for scenarios where the tracker will be blank (verification of existing data instead of a live download) by matching on category.
+ROOT_PATH=$1
+INFO_HASH=$2
+CURRENT_TRACKER_OR_CAT=$3
+ROOT_BASE=`basename "$1"`
+
+if [[ $CURRENT_TRACKER_OR_CAT != "" ]]; then
+  if [[ "$CURRENT_TRACKER_OR_CAT" == *"flacsfor.me"* || "$CURRENT_TRACKER_OR_CAT" == *"RED"* ]]; then
+    gazelle-origin -t red -o "$ROOT_PATH"/origin.yaml --api-key $RED_API_KEY $INFO_HASH
+    echo "Grabbing torrent info for $ROOT_BASE from RED."
+  else
+    echo "No match on $ROOT_BASE with category/tracker of $3. Load again in a matching category, or redownload live, for processing."
+  fi
+else
+  echo "No matches on $ROOT_BASE as category and tracker are both blank. Load again in a matching category, or redownload live, for processing."
+fi
+~~~
 
 Note that this assumes Python has been added to your environment path. If not and you're a Windows user, you can
 fix this by enabling the checkbox at:
