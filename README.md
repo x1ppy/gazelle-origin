@@ -233,6 +233,10 @@ In Options > Downloads > Run an external program on torrent completion, enter th
 
     gazelle-origin -t %T -o "%R/origin.yaml" --api-key <api_key> %I
 
+To avoid triggering the script for unsupported trackers, an alternative script can be used. Update the file and folder name as necessary:
+
+    bash /config/qb-gazelle-origin.sh "%R" %I %T "%L"
+
 Note that this assumes Python has been added to your environment path. If not and you're a Windows user, you can
 fix this by enabling the checkbox at:
 _Start > Settings > Apps & Features > Python > Modify > Modify > Next > Add Python to environment variables_.
