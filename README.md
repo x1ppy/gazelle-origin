@@ -71,8 +71,9 @@ uploader formatting.
 Supported Trackers
 ------------------
 
-Currently, only redacted.ch is supported. Use `--tracker red` or set the `ORIGIN_TRACKER=red` environment variable to
-use it.
+Currently, the following trackers are supported:
+  * redacted.ch: use `--tracker red` or set the `ORIGIN_TRACKER=red`
+  * orpheus.network: use `--tracker ops` or set the `ORIGIN_TRACKER=ops`
 
 Installation
 ------------
@@ -112,6 +113,19 @@ Before saving, the fields should look like this:
 
 After saving, you should see a Torrents API key like this:
 ![after saving](docs/api-done.png "After saving")
+
+### orpheus.network
+
+(Instructions extracted from Jackett)
+
+* Login to this tracker with your browser
+* Open the DevTools panel by pressing F12
+* Select the Network tab
+* Click on the Doc button
+* Refresh the page by pressing F5
+* Select the Headers tab
+* Find 'cookie:' in the Request Headers section
+* Copy the whole cookie string and add it to your `OPS_SESSION_COOKIE` environment variable
 
 Usage
 -----
