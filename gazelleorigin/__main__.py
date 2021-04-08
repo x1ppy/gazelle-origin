@@ -104,14 +104,15 @@ def main():
         sys.exit(EXIT_CODES['tracker'])
     
     environment['tracker'] = environment['tracker'].lower()
-
+    
     if args.api_key:
         environment['api_key'] = args.api_key
-    elif any(os.environ.get(tracker) for tracker in _TRACKER_TOKENS):
+
+    elif any(os.environ.get(t_token) for t_token in _TRACKER_TOKENS):
         for t_token in _TRACKER_TOKENS: # RED_API_KEY, OPS_SESSION_COOKIE
-            token_key = _HANDLERS[environment['tracker']].get(t_token)
-            if token_key:
-                environment['api_key'] = token_key
+            handler = _HANDLERS[environment['tracker']]
+            if handler.get("token_key") == t_token:
+                environment['api_key'] = os.environ.get(t_token)
                 break
 
     if not environment.get('api_key'): # Avoid KeyError
