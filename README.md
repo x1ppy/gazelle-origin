@@ -71,8 +71,9 @@ uploader formatting.
 Supported Trackers
 ------------------
 
-Currently, only redacted.ch is supported. Use `--tracker red` or set the `ORIGIN_TRACKER=red` environment variable to
-use it.
+Currently, the following trackers are supported:
+  * redacted.ch: use `--tracker red` or set the `ORIGIN_TRACKER=red`
+  * orpheus.network: use `--tracker ops` or set the `ORIGIN_TRACKER=ops`
 
 Installation
 ------------
@@ -84,6 +85,7 @@ Install using `pip`:
 Then add your tracker API key (see [Obtaining Your API Key](https://github.com/x1ppy/gazelle-origin#obtaining-your-api-key)) to `~/.bashrc` or equivalent:
 
     export RED_API_KEY=<api_key>
+    export OPS_SESSION_COOKIE=<session_cookie>
 
 Though not required, it's also recommended that you add a default tracker to `~/.bashrc` or equivalent (see [Supported Trackers](#supported-trackers)):
 
@@ -97,7 +99,7 @@ Finally, see [Integration](#torrent-clients) for calling `gazelle-origin` automa
 
 Obtaining Your API Key
 ---------------------
-`gazelle-origin` requires an API key to make API requests. To obtain your API key:
+`gazelle-origin` requires an API key or an session cookie to make API requests. To obtain your API key:
 
 ### redacted.ch
 * Go to your profile and select Access Settings on the right side
@@ -112,6 +114,20 @@ Before saving, the fields should look like this:
 
 After saving, you should see a Torrents API key like this:
 ![after saving](docs/api-done.png "After saving")
+
+### orpheus.network
+
+(Instructions extracted from Jackett)
+
+* Login to this tracker with your browser
+* Open the DevTools panel by pressing F12
+* Select the Network tab
+* Click on the Doc button
+* Refresh the page by pressing F5
+* Select the Headers tab
+* Find 'cookie:' in the Request Headers section
+
+Once you got the cookie string, copy it and add it to your `OPS_SESSION_COOKIE` environment variable. You can also pass the string with the `--api-key` flag.
 
 Usage
 -----

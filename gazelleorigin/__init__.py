@@ -1,1 +1,1 @@
-from .core import GazelleAPI, GazelleAPIError
+from .core import GazelleAPI, GazelleAPIError, Orpheus

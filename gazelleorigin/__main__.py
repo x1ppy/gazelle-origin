@@ -7,7 +7,7 @@ import subprocess
 import sys
 import yaml
 from hashlib import sha1
-from . import GazelleAPI, GazelleAPIError
+from . import GazelleAPI, GazelleAPIError, Orpheus
 
 
 EXIT_CODES = {
@@ -21,11 +21,23 @@ EXIT_CODES = {
     'input-error': 10
 }
 
+_TRACKER_TOKENS = ("RED_API_KEY", "OPS_SESSION_COOKIE")
+_VALID_TRACKERS = ("red", "flacsfor.me", "ops", "opsfet.ch")
+
+_HANDLERS = {
+        "red": {"class": GazelleAPI, "token_key": "RED_API_KEY"},
+        "flacsfor.me": {"class": GazelleAPI, "token_key": "RED_API_KEY"},
+        "ops": {"class": Orpheus, "token_key": "OPS_SESSION_COOKIE"},
+        "opsfet.ch": {"class": Orpheus, "token_key": "OPS_SESSION_COOKIE"}
+        }
+
+
 parser = argparse.ArgumentParser(
     description='Fetches torrent origin information from Gazelle-based music trackers',
     formatter_class=argparse.RawDescriptionHelpFormatter,
     epilog='Either ORIGIN_TRACKER or --tracker must be set to a supported tracker:\n'
-           '  redacted.ch: "RED", or any string containing "flacsfor.me"'
+           '  redacted.ch: "RED", or any string containing "flacsfor.me"\n'
+           '  orpheus.network: "OPS", or any string containing "opsfet.ch"'
 )
 parser.add_argument('torrent', nargs='+', help='torrent identifier, which can be either its info hash, torrent ID, permalink, or path to torrent file(s) whose name or computed info hash should be used')
 parser.add_argument('--out', '-o', help='Path to write origin data (default: print to stdout).', metavar='file')
@@ -67,7 +79,7 @@ def main():
                         if len(var) != 0:
                             print('Skipping invalid line in env file: ' + line)
                         continue
-                    if var[0] == 'RED_API_KEY':
+                    if var[0] in _TRACKER_TOKENS:
                         environment['api_key'] = var[1]
                     elif var[0] == 'ORIGIN_TRACKER':
                         environment['tracker'] = var[1]
@@ -77,31 +89,41 @@ def main():
             print('Unable to open file ' + args.env[0])
             sys.exit(EXIT_CODES['input-error'])
 
-    if args.api_key:
-        environment['api_key'] = args.api_key
-    elif os.environ.get('RED_API_KEY'):
-        environment['api_key'] = os.environ.get('RED_API_KEY')
-
-    if not environment['api_key']:
-        print('API key must be provided using either --api-key or setting the <TRACKER>_API_KEY environment variable.', file=sys.stderr)
-        sys.exit(EXIT_CODES['api-key'])
-
-
     if args.tracker:
         environment['tracker'] = args.tracker
     elif os.environ.get('ORIGIN_TRACKER'):
         environment['tracker'] = os.environ.get('ORIGIN_TRACKER')
 
-    if not environment['tracker']:
+    if not environment.get('tracker'):
         print('Tracker must be provided using either --tracker or setting the ORIGIN_TRACKER environment variable.',
                 file=sys.stderr)
         sys.exit(EXIT_CODES['tracker'])
-    if environment['tracker'].lower() != 'red' and 'flacsfor.me' not in environment['tracker'].lower():
+
+    if not any(tracker in environment['tracker'].lower() for tracker in _VALID_TRACKERS):
         print('Invalid tracker: {0}'.format(environment['tracker']), file=sys.stderr)
         sys.exit(EXIT_CODES['tracker'])
+    
+    environment['tracker'] = environment['tracker'].lower()
+    
+    if args.api_key:
+        environment['api_key'] = args.api_key
+
+    elif any(os.environ.get(t_token) for t_token in _TRACKER_TOKENS):
+        for t_token in _TRACKER_TOKENS: # RED_API_KEY, OPS_SESSION_COOKIE
+            handler = _HANDLERS[environment['tracker']]
+            if handler.get("token_key") == t_token:
+                environment['api_key'] = os.environ.get(t_token)
+                break
+
+    if not environment.get('api_key'): # Avoid KeyError
+        print(f'API key must be provided using either --api-key or setting the {", ".join(_TRACKER_TOKENS)} environment variables.', file=sys.stderr)
+        sys.exit(EXIT_CODES['api-key'])
+
+    
+    handler_class = _HANDLERS[environment['tracker']]["class"]
 
     try:
-        api = GazelleAPI(environment['api_key'])
+        api = handler_class(environment['api_key'])
     except GazelleAPIError as e:
         print('Error initializing Gazelle API client')
         sys.exit(EXIT_CODES[e.code])
