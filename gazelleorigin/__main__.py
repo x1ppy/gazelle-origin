@@ -37,7 +37,7 @@ parser = argparse.ArgumentParser(
     formatter_class=argparse.RawDescriptionHelpFormatter,
     epilog='Either ORIGIN_TRACKER or --tracker must be set to a supported tracker:\n'
            '  redacted.ch: "RED", or any string containing "flacsfor.me"\n'
-           '  orpheus.network: "OPS"'
+           '  orpheus.network: "OPS", or any string containing "opsfet.ch"'
 )
 parser.add_argument('torrent', nargs='+', help='torrent identifier, which can be either its info hash, torrent ID, permalink, or path to torrent file(s) whose name or computed info hash should be used')
 parser.add_argument('--out', '-o', help='Path to write origin data (default: print to stdout).', metavar='file')
