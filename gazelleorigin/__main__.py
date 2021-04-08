@@ -22,12 +22,13 @@ EXIT_CODES = {
 }
 
 _TRACKER_TOKENS = ("RED_API_KEY", "OPS_SESSION_COOKIE")
-_VALID_TRACKERS = ("red", "flacsfor.me", "ops")
+_VALID_TRACKERS = ("red", "flacsfor.me", "ops", "opsfet.ch")
 
 _HANDLERS = {
-        "red": GazelleAPI,
-        "flacsfor.me": GazelleAPI,
-        "ops": Orpheus
+        "red": {"class": GazelleAPI, "token_key": "RED_API_KEY"},
+        "flacsfor.me": {"class": GazelleAPI, "token_key": "RED_API_KEY"},
+        "ops": {"class": Orpheus, "token_key": "OPS_SESSION_COOKIE"},
+        "opsfet.ch": {"class": Orpheus, "token_key": "OPS_SESSION_COOKIE"}
         }
 
 
@@ -88,19 +89,6 @@ def main():
             print('Unable to open file ' + args.env[0])
             sys.exit(EXIT_CODES['input-error'])
 
-    if args.api_key:
-        environment['api_key'] = args.api_key
-    elif any(os.environ.get(tracker) for tracker in _TRACKER_TOKENS):
-        for tracker in _TRACKER_TOKENS:
-            if os.environ.get(tracker):
-                environment['api_key'] = os.environ.get(tracker)
-                break
-
-    if not environment.get('api_key'): # Avoid KeyError
-        print('API key must be provided using either --api-key or setting the <TRACKER>_API_KEY environment variable.', file=sys.stderr)
-        sys.exit(EXIT_CODES['api-key'])
-
-
     if args.tracker:
         environment['tracker'] = args.tracker
     elif os.environ.get('ORIGIN_TRACKER'):
@@ -115,7 +103,23 @@ def main():
         print('Invalid tracker: {0}'.format(environment['tracker']), file=sys.stderr)
         sys.exit(EXIT_CODES['tracker'])
     
-    handler_class = _HANDLERS[environment['tracker'].lower()]
+    environment['tracker'] = environment['tracker'].lower()
+
+    if args.api_key:
+        environment['api_key'] = args.api_key
+    elif any(os.environ.get(tracker) for tracker in _TRACKER_TOKENS):
+        for t_token in _TRACKER_TOKENS: # RED_API_KEY, OPS_SESSION_COOKIE
+            token_key = _HANDLERS[environment['tracker']].get(t_token)
+            if token_key:
+                environment['api_key'] = token_key
+                break
+
+    if not environment.get('api_key'): # Avoid KeyError
+        print(f'API key must be provided using either --api-key or setting the {", ".join(_TRACKER_TOKENS)} environment variables.', file=sys.stderr)
+        sys.exit(EXIT_CODES['api-key'])
+
+    
+    handler_class = _HANDLERS[environment['tracker']]["class"]
 
     try:
         api = handler_class(environment['api_key'])
