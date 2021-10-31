@@ -3,7 +3,6 @@ import json
 import requests
 import textwrap
 import yaml
-import pdb
 
 headers = {
     'Connection': 'keep-alive',
