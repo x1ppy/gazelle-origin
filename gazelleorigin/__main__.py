@@ -74,6 +74,8 @@ def handle_invalid():
     elif args.ignore_invalid == "ask":
         result = ask_invalid()
         return result
+    else:
+        return 'stop'
 
 
 def main():
@@ -132,7 +134,8 @@ def main():
         api = GazelleAPI(environment['api_key'])
     except GazelleAPIError as e:
         print('Error initializing Gazelle API client')
-        sys.exit(EXIT_CODES[e.code])
+        if handle_invalid() == "stop":
+            sys.exit(EXIT_CODES[e.code])
 
     for arg in args.torrent:
         handle_input_torrent(arg, True, args.recursive)
