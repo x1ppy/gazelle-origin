@@ -4,7 +4,6 @@ import requests
 import textwrap
 import yaml
 
-
 headers = {
     'Connection': 'keep-alive',
     'Cache-Control': 'max-age=0',
@@ -75,6 +74,11 @@ class GazelleAPI:
         else:
             artists = 'Various Artists'
 
+        # If the api can return empty tags
+        if not 'tags' in group:
+            group['tags'] = ''
+        if group['tags'] is None:
+            group['tags'] = ''
         dict = {k:html.unescape(v) if isinstance(v, str) else v for k,v in {
             'Artist':         artists,
             'Name':           group['name'],
@@ -93,6 +97,7 @@ class GazelleAPI:
             'Info hash':      torrent['infoHash'],
             'Uploaded':       torrent['time'],
             'Permalink':      'https://redacted.ch/torrents.php?torrentid={0}'.format(torrent['id']),
+            'Tags':           str(', '.join(str(tag) for tag in group['tags']))
         }.items()}
 
         dump = yaml.dump(dict, width=float('inf'), sort_keys=False, allow_unicode=True)
