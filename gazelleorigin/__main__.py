@@ -38,7 +38,6 @@ parser.add_argument('--post', '-p', nargs='+', metavar='file', default=[], help=
                     'These scripts have access to environment variables with info about the item including OUT, ARTIST, NAME, DIRECTORY, EDITION, YEAR, FORMAT, ENCODING')
 parser.add_argument('--recursive', '-r', action='store_true', help='recursively search directories for files')
 parser.add_argument('--no-hash', '-n', action='store_true', help='don\'t compute hash from torrent files')
-# parser.add_argument('--ignore-invalid', '-i', action='store_true', help='continue processing other arguments if an invalid id/hash is supplied')
 parser.add_argument(
     "--ignore-invalid",
     "-i",
