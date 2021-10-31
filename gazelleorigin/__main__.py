@@ -59,11 +59,15 @@ environment = {}
 def ask_invalid():
     """Prompt the user for the next action after encoutnering an error."""
     do_this = ""
-    options_ask = ["skip", "stop"]
+    options_ask = ["c", "s"]
     while do_this not in options_ask:
-        print("Error. STOP the entire program or SKIP this error?")
+        print("Error. (s)top the entire program or (c)ontinue from this error?")
         print("Options (lowercase) = {}".format(options_ask))
         do_this = input("Your choice: ")
+    if do_this == 'c':
+        do_this = "continue"
+    elif do_this == 's':
+        do_this = 'stop'
     return do_this
 
 
@@ -194,6 +198,7 @@ Get torrent's info from GazelleAPI
 torrent can be an id, hash, url, or path
 """
 def handle_input_torrent(torrent, walk=True, recursive=False):
+    print("Handling {}".format(torrent))
     parsed = parse_torrent_input(torrent, walk, recursive)
     if parsed == 'walked':
         return
