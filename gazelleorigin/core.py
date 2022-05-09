@@ -75,7 +75,7 @@ class GazelleAPI:
         else:
             artists = 'Various Artists'
 
-        if release-number == 5:
+        if releaseNumber == 5:
             releases = "EP"
         else:
             releases = "other"
