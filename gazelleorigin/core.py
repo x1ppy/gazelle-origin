@@ -1,4 +1,3 @@
-#test2
 import html
 import json
 import requests
@@ -74,7 +73,9 @@ class GazelleAPI:
             artists = '{0} & {1}'.format(artists[0]['name'], artists[1]['name'])
         else:
             artists = 'Various Artists'
-
+        
+        release-number = group['releaseType']
+        
         # If the api can return empty tags
         if not 'tags' in group:
             group['tags'] = ''
@@ -83,7 +84,7 @@ class GazelleAPI:
         dict = {k:html.unescape(v) if isinstance(v, str) else v for k,v in {
             'Artist':         artists,
             'Name':           group['name'],
-            'Release Type':   group['releaseType'],
+            'Release Type':   release-number,
             'Edition':        torrent['remasterTitle'],
             'Edition year':   torrent['remasterYear'] or '',
             'Media':          torrent['media'],
