@@ -118,6 +118,7 @@ class GazelleAPI:
             'Artist':         artists,
             'Name':           group['name'],
             'Release Type':   releaseTypes,
+            'Original Release Label': group['recordLabel'] or '',
             'Edition':        torrent['remasterTitle'],
             'Edition year':   torrent['remasterYear'] or '',
             'Media':          torrent['media'],
