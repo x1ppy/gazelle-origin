@@ -1,3 +1,4 @@
+#test2
 import html
 import json
 import requests
@@ -66,7 +67,6 @@ class GazelleAPI:
         if group['categoryName'] != 'Music':
             raise GazelleAPIError('music', 'Not a music torrent')
 
-        # Creates the artists name
         artists = group['musicInfo']['artists']
         if len(artists) == 1:
             artists = artists[0]['name']
@@ -75,13 +75,6 @@ class GazelleAPI:
         else:
             artists = 'Various Artists'
 
-        # Creates the Release Type
-        #release-number = group['releaseType']
-        #if release-number == 5:
-        #    releases = "EP"
-        #else:
-        #    releases = "other"
-            
         # If the api can return empty tags
         if not 'tags' in group:
             group['tags'] = ''
