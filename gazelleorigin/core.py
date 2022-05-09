@@ -62,11 +62,11 @@ class GazelleAPI:
         info = self.request('torrent', hash=hash, id=id)
         group = info['group']
         torrent = info['torrent']
-        #release-number = group['releaseType']
 
         if group['categoryName'] != 'Music':
             raise GazelleAPIError('music', 'Not a music torrent')
 
+        releaseNumber = group['releaseType']
         artists = group['musicInfo']['artists']
         if len(artists) == 1:
             artists = artists[0]['name']
