@@ -77,10 +77,36 @@ class GazelleAPI:
 
         if releaseNumber == 1:
             releaseTypes = "Album"
+        elif releaseNumber == 3:
+            releaseTypes = "Soundtrack"
         elif releaseNumber == 5:
-            releaseTypes = "EP"    
+            releaseTypes = "EP"
+        elif releaseNumber == 6:
+            releaseTypes = "Anthology"
+        elif releaseNumber == 7:
+            releaseTypes = "Compilation"
+        elif releaseNumber == 9:
+            releaseTypes = "Single"
+        elif releaseNumber == 11:
+            releaseTypes = "Live album"
+        elif releaseNumber == 13:
+            releaseTypes = "Remix"
+        elif releaseNumber == 14:
+            releaseTypes = "Bootleg"
+        elif releaseNumber == 15:
+            releaseTypes = "Interview"
+        elif releaseNumber == 16:
+            releaseTypes = "Mixtape"
+        elif releaseNumber == 17:
+            releaseTypes = "Demo"
+        elif releaseNumber == 18:
+            releaseTypes = "Concert Recording"
+        elif releaseNumber == 19:
+            releaseTypes = "DJ Mix"
+        elif releaseNumber == 21:
+            releaseTypes = "Unknown"  
         else:
-            releaseTypes = "other"
+            releaseTypes = "none"
         
         # If the api can return empty tags
         if not 'tags' in group:
