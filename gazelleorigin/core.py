@@ -76,11 +76,11 @@ class GazelleAPI:
             artists = 'Various Artists'
 
         if releaseNumber == 1:
-            release-type = "Album"
+            releaseTypes = "Album"
         elif releaseNumber == 5:
-            release-type = "EP"    
+            releaseTypes = "EP"    
         else:
-            release-type = "other"
+            releaseTypes = "other"
         
         # If the api can return empty tags
         if not 'tags' in group:
@@ -90,7 +90,7 @@ class GazelleAPI:
         dict = {k:html.unescape(v) if isinstance(v, str) else v for k,v in {
             'Artist':         artists,
             'Name':           group['name'],
-            'Release Type':   release-type,
+            'Release Type':   releaseTypes,
             'Edition':        torrent['remasterTitle'],
             'Edition year':   torrent['remasterYear'] or '',
             'Media':          torrent['media'],
