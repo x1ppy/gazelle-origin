@@ -67,13 +67,13 @@ class GazelleAPI:
         if group['categoryName'] != 'Music':
             raise GazelleAPIError('music', 'Not a music torrent')
 
-        artists = group['musicInfo']['artists']
-        if len(artists) == 1:
-            artists = artists[0]['name']
-        elif len(artists) == 2:
-            artists = '{0} & {1}'.format(artists[0]['name'], artists[1]['name'])
+        artistsP = group['musicInfo']['artists']
+        if len(artistsP) == 1:
+            artistsP = artistsP[0]['name']
+        elif len(artistsP) == 2:
+            artistsP = '{0} & {1}'.format(artistsP[0]['name'], artistsP[1]['name'])
         else:
-            artists = 'Various Artists'
+            artistsP = 'Various Artists'
         
         
         # If the api can return empty tags
@@ -82,7 +82,7 @@ class GazelleAPI:
         if group['tags'] is None:
             group['tags'] = ''
         dict = {k:html.unescape(v) if isinstance(v, str) else v for k,v in {
-            'Artist':         artists,
+            'Artist':         artistsP,
             'Name':           group['name'],
             'Release Type':   "release-number",
             'Edition':        torrent['remasterTitle'],
