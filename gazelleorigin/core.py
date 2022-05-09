@@ -84,7 +84,7 @@ class GazelleAPI:
         dict = {k:html.unescape(v) if isinstance(v, str) else v for k,v in {
             'Artist':         artists,
             'Name':           group['name'],
-            'Release Type':   "release-number",
+            'Release Type':   releaseNumber,
             'Edition':        torrent['remasterTitle'],
             'Edition year':   torrent['remasterYear'] or '',
             'Media':          torrent['media'],
