@@ -75,6 +75,7 @@ class GazelleAPI:
         else:
             artists = 'Various Artists'
 
+        # Maps release type numbers to their sting values
         if releaseNumber == 1:
             releaseTypes = "Album"
         elif releaseNumber == 3:
