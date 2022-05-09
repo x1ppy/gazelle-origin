@@ -62,6 +62,7 @@ class GazelleAPI:
         info = self.request('torrent', hash=hash, id=id)
         group = info['group']
         torrent = info['torrent']
+        release-number = group['releaseType']
 
         if group['categoryName'] != 'Music':
             raise GazelleAPIError('music', 'Not a music torrent')
@@ -74,7 +75,6 @@ class GazelleAPI:
         else:
             artists = 'Various Artists'
         
-        release-number = group['releaseType']
         
         # If the api can return empty tags
         if not 'tags' in group:
