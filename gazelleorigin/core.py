@@ -62,7 +62,7 @@ class GazelleAPI:
         info = self.request('torrent', hash=hash, id=id)
         group = info['group']
         torrent = info['torrent']
-        release-number = group['releaseType']
+        #release-number = group['releaseType']
 
         if group['categoryName'] != 'Music':
             raise GazelleAPIError('music', 'Not a music torrent')
@@ -84,7 +84,7 @@ class GazelleAPI:
         dict = {k:html.unescape(v) if isinstance(v, str) else v for k,v in {
             'Artist':         artists,
             'Name':           group['name'],
-            'Release Type':   release-number,
+            'Release Type':   "release-number",
             'Edition':        torrent['remasterTitle'],
             'Edition year':   torrent['remasterYear'] or '',
             'Media':          torrent['media'],
