@@ -119,7 +119,7 @@ class GazelleAPI:
             'Artist':         artists,
             'Name':           group['name'],
             'Release Type':   releaseTypes,
-            'Cover':          redcover,
+            'Cover':          group['wikiImage'],
             'Original Release Label': group['recordLabel'] or '',
             'Original Catalog number': group['catalogueNumber'] or '',
             'Edition':        torrent['remasterTitle'],
