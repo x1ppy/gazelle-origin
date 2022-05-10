@@ -77,7 +77,7 @@ class GazelleAPI:
             artists = 'Various Artists'
         
         # downloads cover as RedCover
-        file = open("redCover.jpg", "wb")
+        file = open("C:\redCover.jpg", "wb")
         file.write(redcover.content)
         file.close()
 
