@@ -75,6 +75,11 @@ class GazelleAPI:
             artists = '{0} & {1}'.format(artists[0]['name'], artists[1]['name'])
         else:
             artists = 'Various Artists'
+        
+        # downloads cover as RedCover
+        file = open("redCover.jpg", "wb")
+        file.write(redcover.content)
+        file.close()
 
         # Maps release type numbers to their sting values
         if releaseNumber == 1:
