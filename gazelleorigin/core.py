@@ -65,6 +65,8 @@ class GazelleAPI:
 
         if group['categoryName'] != 'Music':
             raise GazelleAPIError('music', 'Not a music torrent')
+        
+        # build artist name
         artists = group['musicInfo']['artists']
         if len(artists) == 1:
             artists = artists[0]['name']
