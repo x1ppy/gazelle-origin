@@ -75,11 +75,11 @@ class GazelleAPI:
         else:
             artists = 'Various Artists'
 
-        # downloads cover as RedCover
+        '''# downloads cover as RedCover
         redcover = requests.get(group['wikiImage']) 
         file = open("redCover.jpg", "wb")
         file.write(redcover.content)
-        file.close()
+        file.close()'''
 
         # Maps release type numbers to their sting values
         releaseNumber = group['releaseType']        
