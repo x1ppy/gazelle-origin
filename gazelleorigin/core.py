@@ -78,7 +78,9 @@ class GazelleAPI:
 
         # build full artists name list
         fullArtists = group['musicInfo']['artists']
-        fullArtists = fullArtists['name']
+        for s in range(len(group)):
+            fullArtists = str(', '.join(str(name) for name in fullArtists[s]['name']))
+        #fullArtists = fullArtists['name']
         #fullArtists = str(', '.join(str(name) for name in fullArtists['name']))
         #str(', '.join(str(tag) for tag in group['tags']))
 
