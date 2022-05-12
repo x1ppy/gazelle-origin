@@ -65,8 +65,6 @@ class GazelleAPI:
 
         if group['categoryName'] != 'Music':
             raise GazelleAPIError('music', 'Not a music torrent')
-        redcover = requests.get(group['wikiImage']) 
-        releaseNumber = group['releaseType']
         artists = group['musicInfo']['artists']
         if len(artists) == 1:
             artists = artists[0]['name']
@@ -76,11 +74,13 @@ class GazelleAPI:
             artists = 'Various Artists'
 
         # downloads cover as RedCover
+        redcover = requests.get(group['wikiImage']) 
         file = open("redCover.jpg", "wb")
         file.write(redcover.content)
         file.close()
 
         # Maps release type numbers to their sting values
+        releaseNumber = group['releaseType']        
         if releaseNumber == 1:
             releaseTypes = "Album"
         elif releaseNumber == 3:
