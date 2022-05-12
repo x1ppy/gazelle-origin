@@ -76,6 +76,9 @@ class GazelleAPI:
         else:
             artists = 'Various Artists'
 
+        # build artist name
+        fullartists = group['musicInfo']['artists']['name']
+
         '''# downloads cover as RedCover
         redcover = requests.get(group['wikiImage']) 
         file = open("redCover.jpg", "wb")
