@@ -78,8 +78,9 @@ class GazelleAPI:
 
         # build full artists name list
         fullArtists = group['musicInfo']['artists']
-        #fullArtists = fullArtists[0]['name']
-        fullArtists = str(', '.join(str(artist) for artist in fullArtists['name']))
+        fullArtists = fullArtists['name']
+        #fullArtists = str(', '.join(str(name) for name in fullArtists['name']))
+        #str(', '.join(str(tag) for tag in group['tags']))
 
         '''# downloads cover as RedCover
         redcover = requests.get(group['wikiImage']) 
@@ -131,7 +132,7 @@ class GazelleAPI:
             'Artist':         artists,
             'Name':           group['name'],
             'Release Type':   releaseTypes,
-            'Full Artist':    fullArtists,            
+            #'Full Artist':    fullArtists,            
             'Cover':          group['wikiImage'],
             'Original Release Label': group['recordLabel'] or '',
             'Original Catalog number': group['catalogueNumber'] or '',
