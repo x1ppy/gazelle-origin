@@ -4,6 +4,7 @@ import requests
 import textwrap
 import yaml
 
+
 headers = {
     'Connection': 'keep-alive',
     'Cache-Control': 'max-age=0',
@@ -74,15 +75,6 @@ class GazelleAPI:
             artists = '{0} & {1}'.format(artists[0]['name'], artists[1]['name'])
         else:
             artists = 'Various Artists'
-            
-        # build full artist name
-        fullartists = group['musicInfo']['artists']
-        if len(fullartists) == 1:
-            fullartists = fullartists[0]['name']
-        elif len(fullartists) >= 2:
-            fullartists = str(', '.join(str(artist) for artist in group['musicInfo']['artists']))
-            #artists = '{0} & {1}'.format(artists[0]['name'], artists[1]['name'])
-        
 
         '''# downloads cover as RedCover
         redcover = requests.get(group['wikiImage']) 
@@ -153,9 +145,6 @@ class GazelleAPI:
             'Uploaded':       torrent['time'],
             'Permalink':      'https://redacted.ch/torrents.php?torrentid={0}'.format(torrent['id']),
             'Tags':           str(', '.join(str(tag) for tag in group['tags']))
-            'Full Artists':   fullartists,
-            #'Full Artists':   str(', '.join(str(artist) for artist in group['musicInfo']['artists']))
-            
         }.items()}
 
         dump = yaml.dump(dict, width=float('inf'), sort_keys=False, allow_unicode=True)
