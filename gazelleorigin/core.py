@@ -144,6 +144,8 @@ class GazelleAPI:
             'Uploaded':       torrent['time'],
             'Permalink':      'https://redacted.ch/torrents.php?torrentid={0}'.format(torrent['id']),
             'Tags':           str(', '.join(str(tag) for tag in group['tags']))
+            'Full Artists List': str(', '.join(str(tag) for tag in group['musicInfo']['artists']))
+            
         }.items()}
 
         dump = yaml.dump(dict, width=float('inf'), sort_keys=False, allow_unicode=True)
