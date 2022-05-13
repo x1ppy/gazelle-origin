@@ -106,9 +106,19 @@ class GazelleAPI:
             djArtistOutput = []    
             for artist in djArtist:
                 djArtistOutput.append(artist['name']) 
-            djArtist = (', '.join(djArtistOutput))   
+            djArtist = (', '.join(djArtistOutput))      
 
-        '''# downloads cover as RedCover
+        # build full conductor artists name list
+        conductorArtist = group["musicInfo"]["conductor"]
+        if len(conductorArtist) >= 1:
+            conductorArtistOutput = []    
+            for artist in conductorArtist:
+                conductorArtistOutput.append(artist['name']) 
+            conductorArtist = (', '.join(conductorArtistOutput))  
+
+        ''' # This is code that works and will download the cover to whatever directory you run the script from
+        # it is not tested or gauranteed to work 
+        # downloads cover as RedCover
         redcover = requests.get(group['wikiImage']) 
         file = open("redCover.jpg", "wb")
         file.write(redcover.content)
@@ -157,14 +167,15 @@ class GazelleAPI:
         dict = {k:html.unescape(v) if isinstance(v, str) else v for k,v in {
             'Artist':         artists,
             'Name':           group['name'],
-            'Release Type':   releaseTypes,
-            'Main Artists':   mainArtist or '',
-            'Featured Artists':  featuredArtist or '', 
+            'Release type':   releaseTypes,
+            'Main artists':   mainArtist or '',
+            'Featured artists':  featuredArtist or '', 
             'Composers':       composerArtist or '',
+            'Conductors':       conductorArtist or '',
             'DJs':            djArtist or '',            
             'Cover':          group['wikiImage'],
-            'Original Release Label': group['recordLabel'] or '',
-            'Original Catalog number': group['catalogueNumber'] or '',
+            'Original release label': group['recordLabel'] or '',
+            'Original catalog number': group['catalogueNumber'] or '',
             'Edition':        torrent['remasterTitle'],
             'Edition year':   torrent['remasterYear'] or '',
             'Media':          torrent['media'],
