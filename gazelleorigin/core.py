@@ -77,7 +77,7 @@ class GazelleAPI:
             artists = 'Various Artists'
 
         # build full composer artists name list
-        composerArtist = data_dict["response"]["group"]["musicInfo"]["composers"]
+        composerArtist = group["musicInfo"]["composers"]
         if len(composerArtist) >= 1:
             composerArtistOutput = []    
             for artist in composerArtist:
@@ -85,7 +85,7 @@ class GazelleAPI:
             composerArtist = (', '.join(composerArtistOutput))    
 
         # build full main artists name list
-        mainArtist = data_dict["response"]["group"]["musicInfo"]["artists"]
+        mainArtist = group["musicInfo"]["artists"]
         if len(mainArtist) >= 1:
             mainArtistOutput = []    
             for artist in mainArtist:
@@ -93,7 +93,7 @@ class GazelleAPI:
             mainArtist = (', '.join(mainArtistOutput))    
 
         # build full featured artists name list
-        featuredArtist = data_dict["response"]["group"]["musicInfo"]["with"]
+        featuredArtist = group["musicInfo"]["with"]
         if len(featuredArtist) >= 1:
             featuredArtistOutput = []    
             for artist in featuredArtist:
