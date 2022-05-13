@@ -76,13 +76,29 @@ class GazelleAPI:
         else:
             artists = 'Various Artists'
 
-        '''# build full artists name list
-        fullArtists = group['musicInfo']['artists']
-        for s in range(len(group)):
-            fullArtists = str(', '.join(str(name) for name in fullArtists[s]['name']))
-        #fullArtists = fullArtists['name']
-        #fullArtists = str(', '.join(str(name) for name in fullArtists['name']))
-        #str(', '.join(str(tag) for tag in group['tags']))'''
+        # build full composer artists name list
+        composerArtist = data_dict["response"]["group"]["musicInfo"]["composers"]
+        if len(composerArtist) >= 1:
+            composerArtistOutput = []    
+            for artist in composerArtist:
+                composerArtistOutput.append(artist['name']) 
+            composerArtist = (', '.join(composerArtistOutput))    
+
+        # build full main artists name list
+        mainArtist = data_dict["response"]["group"]["musicInfo"]["artists"]
+        if len(mainArtist) >= 1:
+            mainArtistOutput = []    
+            for artist in mainArtist:
+                mainArtistOutput.append(artist['name']) 
+            mainArtist = (', '.join(mainArtistOutput))    
+
+        # build full featured artists name list
+        featuredArtist = data_dict["response"]["group"]["musicInfo"]["with"]
+        if len(featuredArtist) >= 1:
+            featuredArtistOutput = []    
+            for artist in featuredArtist:
+                featuredArtistOutput.append(artist['name']) 
+            featuredArtist = (', '.join(featuredArtistOutput))    
 
         '''# downloads cover as RedCover
         redcover = requests.get(group['wikiImage']) 
