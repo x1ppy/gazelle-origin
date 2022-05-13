@@ -76,14 +76,6 @@ class GazelleAPI:
         else:
             artists = 'Various Artists'
 
-        # build full composer artists name list
-        composerArtist = group["musicInfo"]["composers"]
-        if len(composerArtist) >= 1:
-            composerArtistOutput = []    
-            for artist in composerArtist:
-                composerArtistOutput.append(artist['name']) 
-            composerArtist = (', '.join(composerArtistOutput))    
-
         # build full main artists name list
         mainArtist = group["musicInfo"]["artists"]
         if len(mainArtist) >= 1:
@@ -99,6 +91,22 @@ class GazelleAPI:
             for artist in featuredArtist:
                 featuredArtistOutput.append(artist['name']) 
             featuredArtist = (', '.join(featuredArtistOutput))    
+
+        # build full composer artists name list
+        composerArtist = group["musicInfo"]["composers"]
+        if len(composerArtist) >= 1:
+            composerArtistOutput = []    
+            for artist in composerArtist:
+                composerArtistOutput.append(artist['name']) 
+            composerArtist = (', '.join(composerArtistOutput))    
+
+        # build full dj artists name list
+        djArtist = group["musicInfo"]["dj"]
+        if len(djArtist) >= 1:
+            djArtistOutput = []    
+            for artist in djArtist:
+                djArtistOutput.append(artist['name']) 
+            djArtist = (', '.join(djArtistOutput))   
 
         '''# downloads cover as RedCover
         redcover = requests.get(group['wikiImage']) 
@@ -150,9 +158,10 @@ class GazelleAPI:
             'Artist':         artists,
             'Name':           group['name'],
             'Release Type':   releaseTypes,
-            'Composer':       composerArtist or '',
             'Main Artists':   mainArtist or '',
-            'Featured Artists':  featuredArtist or '',            
+            'Featured Artists':  featuredArtist or '', 
+            'Composers':       composerArtist or '',
+            'DJs':            djArtist or '',            
             'Cover':          group['wikiImage'],
             'Original Release Label': group['recordLabel'] or '',
             'Original Catalog number': group['catalogueNumber'] or '',
