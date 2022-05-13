@@ -150,7 +150,7 @@ class GazelleAPI:
             'Artist':         artists,
             'Name':           group['name'],
             'Release Type':   releaseTypes,
-            #'Full Artist':    fullArtists,            
+            'Main Artists':    mainArtist,            
             'Cover':          group['wikiImage'],
             'Original Release Label': group['recordLabel'] or '',
             'Original Catalog number': group['catalogueNumber'] or '',
