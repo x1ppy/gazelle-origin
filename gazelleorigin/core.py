@@ -197,19 +197,19 @@ class GazelleAPI:
             'Edition':                 torrent['remasterTitle'],
             'Edition year':            torrent['remasterYear'] or '',
             'Media':                   torrent['media'],
-            'Catalog number': torrent['remasterCatalogueNumber'],
-            'Record label':   torrent['remasterRecordLabel'],
-            'Original year':  group['year'] or '',
-            'Format':         torrent['format'],
-            'Encoding':       torrent['encoding'],
-            'Log':            '{0}%'.format(torrent['logScore']) if torrent['hasLog'] else '',
-            'Directory':      torrent['filePath'],
-            'Size':           torrent['size'],
-            'File count':     torrent['fileCount'],
-            'Info hash':      torrent['infoHash'],
-            'Uploaded':       torrent['time'],
-            'Permalink':      'https://redacted.ch/torrents.php?torrentid={0}'.format(torrent['id']),
-            'Tags':           str(', '.join(str(tag) for tag in group['tags']))
+            'Catalog number':          torrent['remasterCatalogueNumber'],
+            'Record label':            torrent['remasterRecordLabel'],
+            'Original year':           group['year'] or '',
+            'Format':                  torrent['format'],
+            'Encoding':                torrent['encoding'],
+            'Log':                     '{0}%'.format(torrent['logScore']) if torrent['hasLog'] else '',
+            'Directory':               torrent['filePath'],
+            'Size':                    torrent['size'],
+            'File count':              torrent['fileCount'],
+            'Info hash':               torrent['infoHash'],
+            'Uploaded':                torrent['time'],
+            'Permalink':               'https://redacted.ch/torrents.php?torrentid={0}'.format(torrent['id']),
+            'Tags':                    str(', '.join(str(tag) for tag in group['tags']))
         }.items()}
 
         dump = yaml.dump(dict, width=float('inf'), sort_keys=False, allow_unicode=True)
