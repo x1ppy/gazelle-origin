@@ -237,6 +237,6 @@ class GazelleAPI:
         groupDescription = html.unescape(group['wikiBody']).strip('\r\n')
         if groupDescription:
             groupDescription = textwrap.indent(groupDescription, '  ', lambda line: True)
-            result += 'Description: |-\n{0}\n\n'.format(groupDescription)
+            result += '\n\nDescription: |-\n{0}\n\n'.format(groupDescription)
 
         return result
