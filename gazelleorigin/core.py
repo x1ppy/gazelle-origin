@@ -228,6 +228,11 @@ class GazelleAPI:
             comment = textwrap.indent(comment, '  ', lambda line: True)
             result += 'Comment: |-\n{0}\n\n'.format(comment)
 
+        groupDescription = html.unescape(group['wikiBody']).strip('\r\n')
+        if groupDescription:
+            groupDescription = textwrap.indent(cgroupDescription, '  ', lambda line: True)
+            result += 'Description: |-\n{0}\n\n'.format(groupDescription)
+
         out = []
         for el in html.unescape(torrent['fileList']).replace('}}}', '').split('|||'):
             name, size = el.split('{{{')
