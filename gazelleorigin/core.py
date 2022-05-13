@@ -185,7 +185,7 @@ class GazelleAPI:
             'Name':                    group['name'],
             'Release type':            releaseTypes,
             'Encoding':                torrent['encoding'],
-            'Tags':                    str(', '.join(str(tag) for tag in group['tags']))
+            'Tags':                    str(', '.join(str(tag) for tag in group['tags'])),
             'Main artists':            mainArtist or '',
             'Featured artists':        featuredArtist or '', 
             'Producers':               producerArtist or '',
@@ -209,7 +209,7 @@ class GazelleAPI:
             'Info hash':               torrent['infoHash'],
             'Uploaded':                torrent['time'],
             'Permalink':               'https://redacted.ch/torrents.php?torrentid={0}'.format(torrent['id']),      
-            'Cover':                   group['wikiImage'],
+            'Cover':                   group['wikiImage']
         }.items()}
 
         dump = yaml.dump(dict, width=float('inf'), sort_keys=False, allow_unicode=True)
