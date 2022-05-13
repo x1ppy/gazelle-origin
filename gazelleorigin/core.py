@@ -90,15 +90,15 @@ class GazelleAPI:
             featuredArtistOutput = []    
             for artist in featuredArtist:
                 featuredArtistOutput.append(artist['name']) 
-            featuredArtist = (', '.join(featuredArtistOutput))    
+            featuredArtist = (', '.join(featuredArtistOutput))   
 
-        # build full composer artists name list
-        composerArtist = group["musicInfo"]["composers"]
-        if len(composerArtist) >= 1:
-            composerArtistOutput = []    
-            for artist in composerArtist:
-                composerArtistOutput.append(artist['name']) 
-            composerArtist = (', '.join(composerArtistOutput))    
+        # build full producer artists name list
+        producerArtist = group["musicInfo"]["producer"]
+        if len(producerArtist) >= 1:
+            producerArtistOutput = []    
+            for artist in producerArtist:
+                producerArtistOutput.append(artist['name']) 
+            producerArtist = (', '.join(producerArtistOutput))    
 
         # build full dj artists name list
         djArtist = group["musicInfo"]["dj"]
@@ -106,7 +106,23 @@ class GazelleAPI:
             djArtistOutput = []    
             for artist in djArtist:
                 djArtistOutput.append(artist['name']) 
-            djArtist = (', '.join(djArtistOutput))      
+            djArtist = (', '.join(djArtistOutput))    
+
+        # build full remix artists name list
+        remixArtist = group["musicInfo"]["remixedBy"]
+        if len(remixArtist) >= 1:
+            remixArtistOutput = []    
+            for artist in remixArtist:
+                remixArtistOutput.append(artist['name']) 
+            remixArtist = (', '.join(remixArtistOutput))     
+
+        # build full composer artists name list
+        composerArtist = group["musicInfo"]["composers"]
+        if len(composerArtist) >= 1:
+            composerArtistOutput = []    
+            for artist in composerArtist:
+                composerArtistOutput.append(artist['name']) 
+            composerArtist = (', '.join(composerArtistOutput))      
 
         # build full conductor artists name list
         conductorArtist = group["musicInfo"]["conductor"]
@@ -170,9 +186,11 @@ class GazelleAPI:
             'Release type':   releaseTypes,
             'Main artists':   mainArtist or '',
             'Featured artists':  featuredArtist or '', 
+            'Producers':       producerArtist or '',
+            'Remix artists':       remixArtist or '',
+            'DJs':            djArtist or '',    
             'Composers':       composerArtist or '',
-            'Conductors':       conductorArtist or '',
-            'DJs':            djArtist or '',            
+            'Conductors':       conductorArtist or '',        
             'Cover':          group['wikiImage'],
             'Original release label': group['recordLabel'] or '',
             'Original catalog number': group['catalogueNumber'] or '',
