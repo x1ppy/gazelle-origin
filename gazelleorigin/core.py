@@ -232,7 +232,7 @@ class GazelleAPI:
         for el in html.unescape(torrent['fileList']).replace('}}}', '').split('|||'):
             name, size = el.split('{{{')
             out.append({'Name': name, 'Size': int(size)})
-        result += yaml.dump({'\nFiles': out}, width=float('inf'), allow_unicode=True)
+        result += yaml.dump({'Files': out}, width=float('inf'), allow_unicode=True)
 
         groupDescription = html.unescape(group['wikiBody']).strip('\r\n')
         if groupDescription:
