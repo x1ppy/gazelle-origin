@@ -234,7 +234,7 @@ class GazelleAPI:
             out.append({'Name': name, 'Size': int(size)})
         result += yaml.dump({'Files': out}, width=float('inf'), allow_unicode=True)
 
-        groupDescription = html.unescape(group['wikiBody']).strip('\r\n')
+        groupDescription = html.unescape(group['bbBody']).strip('\r\n')
         if groupDescription:
             groupDescription = textwrap.indent(groupDescription, '  ', lambda line: True)
             result += '\n\nDescription: |-\n{0}\n\n'.format(groupDescription)
