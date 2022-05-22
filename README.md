@@ -3,7 +3,7 @@ gazelle-origin (plus)
 
 `gazelle-origin` is a script that fetches and saves YAML torrent origin information from Gazelle-based music trackers. 
 
-This is a fork of x1ppy's work that adds a significant amount of meta data to the yaml file including tags (thanks to RollingStone), artists (organized by type), release type, orginal label and cat # (for those releases that were never updated), the cover art URL and the group decription. More could be added easily.
+This is a fork of x1ppy's work that adds a significant amount of meta data to the yaml file including tags (thanks to RollingStar's fork), artists (organized by type), release type, orginal label and cat # (for those releases that were never updated), the cover art URL and the group decription. More could be added easily.
 
 Example output from `gazelle-origin` (plus):
 
