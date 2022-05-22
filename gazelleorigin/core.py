@@ -132,14 +132,6 @@ class GazelleAPI:
                 conductorArtistOutput.append(artist['name']) 
             conductorArtist = (', '.join(conductorArtistOutput))  
 
-        ''' # This is code that works and will download the cover to whatever directory you run the script from
-        # it is not tested or gauranteed to work 
-        # downloads cover as RedCover
-        redcover = requests.get(group['wikiImage']) 
-        file = open("redCover.jpg", "wb")
-        file.write(redcover.content)
-        file.close()'''
-
         # Maps release type numbers to their sting values
         releaseNumber = group['releaseType']        
         if releaseNumber == 1:
