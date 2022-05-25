@@ -331,6 +331,9 @@ originquery:
 
 Changelog
 ---------
+### [3.0.0] - 2022-05-25
+* Added additional metadata and re-ordered yaml file from spinfast319 and RollingStar forks
+* Metadata added: Tags, Release type, Main artists, Featured artists, Producers, Remix artists, DJs, Composers, Conductors, Original release label, Original catalog number, Cover, Description
 ### [2.2.1] - 2020-11-16
 * Fix URL queries
 ### [2.2.0] - 2020-11-02
@@ -354,6 +357,7 @@ Changelog
 ### [1.0.0] - 2020-03-24
 * First tagged release
 
+[3.0.0]: https://github.com/x1ppy/gazelle-origin/compare/2.2.1...spinfast319:master
 [2.2.1]: https://github.com/x1ppy/gazelle-origin/compare/2.2.0...2.2.1
 [2.2.0]: https://github.com/x1ppy/gazelle-origin/compare/2.1.1...2.2.0
 [2.1.1]: https://github.com/x1ppy/gazelle-origin/compare/2.1.0...2.1.1
