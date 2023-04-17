@@ -272,6 +272,11 @@ Or you can manually go through your existing downloads and populate them with or
     $> cd /path/to/another/torrent
     $> gazelle-origin -o origin.yaml "https://redacted.ch/torrents.php?torrentid=2"
     $> ...
+    
+    
+Managing a large music library with origin files
+-----------
+This script provides data that, when used in conjunction with other scripts, can let you manage a large music library when the source of the music has good metadata you want to use to organize it.  You can find an overview of the scripts and workflow at [Origin-Music-Management](https://github.com/spinfast319/Origin-Music-Management). 
 
 Integration
 -----------
