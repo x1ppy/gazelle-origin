@@ -38,7 +38,14 @@ parser.add_argument('--post', '-p', nargs='+', metavar='file', default=[], help=
                     'These scripts have access to environment variables with info about the item including OUT, ARTIST, NAME, DIRECTORY, EDITION, YEAR, FORMAT, ENCODING')
 parser.add_argument('--recursive', '-r', action='store_true', help='recursively search directories for files')
 parser.add_argument('--no-hash', '-n', action='store_true', help='don\'t compute hash from torrent files')
-parser.add_argument('--ignore-invalid', '-i', action='store_true', help='continue processing other arguments if an invalid id/hash is supplied')
+parser.add_argument(
+    "--ignore-invalid",
+    "-i",
+    default="ask",
+    const="ask",
+    nargs="?",
+    choices=["stop", "ask", "continue"],
+    help="Stop, ask, or continue when encountering an error (default: %(default)s)")
 parser.add_argument('--deduplicate', '-d', action='store_true', help='if specified, only one torrent with any given id/hash will be fetched')
 
 
@@ -46,6 +53,32 @@ api = None
 args = None
 fetched = {}
 environment = {}
+
+
+def ask_invalid():
+    """Prompt the user for the next action after encoutnering an error."""
+    do_this = ""
+    options_ask = ["c", "s"]
+    while do_this not in options_ask:
+        print("Error. (s)top the entire program or (c)ontinue from this error?")
+        print("Options (lowercase) = {}".format(options_ask))
+        do_this = input("Your choice: ")
+    if do_this == 'c':
+        do_this = "continue"
+    elif do_this == 's':
+        do_this = 'stop'
+    return do_this
+
+
+def handle_invalid():
+    """Handle an invalid torrent error."""
+    if args.ignore_invalid == "continue":
+        return "continue"
+    elif args.ignore_invalid == "ask":
+        result = ask_invalid()
+        return result
+    else:
+        return 'stop'
 
 
 def main():
@@ -104,7 +137,8 @@ def main():
         api = GazelleAPI(environment['api_key'])
     except GazelleAPIError as e:
         print('Error initializing Gazelle API client')
-        sys.exit(EXIT_CODES[e.code])
+        if handle_invalid() == "stop":
+            sys.exit(EXIT_CODES[e.code])
 
     for arg in args.torrent:
         handle_input_torrent(arg, True, args.recursive)
@@ -140,7 +174,7 @@ def parse_torrent_input(torrent, walk=True, recursive=False):
                 except:
                     print('Found torrent file ' + torrent + ' but unable to load bencoder module to compute hash')
                     print('Install bencoder (pip install bencoder) then try again or pass --no-hash to not compute the hash')
-                    if args.ignore_invalid:
+                    if handle_invalid() != "stop":
                         return None
                     else:
                         sys.exit(EXIT_CODES['input-error'])
@@ -163,14 +197,16 @@ Get torrent's info from GazelleAPI
 torrent can be an id, hash, url, or path
 """
 def handle_input_torrent(torrent, walk=True, recursive=False):
+    print("Handling {}".format(torrent))
     parsed = parse_torrent_input(torrent, walk, recursive)
     if parsed == 'walked':
         return
     if not parsed:
         print('Invalid torrent ID, hash, file, or URL: ' + torrent, file=sys.stderr)
-        if args.ignore_invalid:
+        if handle_invalid() != "stop":
             return
-        sys.exit(EXIT_CODES['hash'])
+        else:
+            sys.exit(EXIT_CODES["hash"])
 
     if args.deduplicate:
         if 'id' in parsed:
@@ -186,7 +222,7 @@ def handle_input_torrent(torrent, walk=True, recursive=False):
     try:
         info = api.get_torrent_info(**parsed)
     except GazelleAPIError as e:
-        if not args.ignore_invalid:
+        if handle_invalid() == "stop":
             skip = False
         elif e.code == 'request':
             # If server returned 500 series error then stop because server might be having trouble
